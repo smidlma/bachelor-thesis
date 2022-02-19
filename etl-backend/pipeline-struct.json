@@ -1,0 +1,36 @@
+{
+    "name": "Pipeline",
+    "sources": [
+        {
+            "name": "Sample Source CSV",
+            "type": "CSV",
+            "filePath": "/file.csv",
+            "schema": {},
+            "transformations": [
+                {}
+            ]
+        },
+        {
+            "name": "Sample Source POSTGRES",
+            "type": " POSTGRESQL",
+            "connection": {
+                "host": "address",
+                "port": 5522,
+                "user": "User",
+                "password": "password"
+            },
+            "schema": {},
+            "transformations": [
+                {}
+            ]
+        }
+    ],
+    "transformations": [
+        {}
+    ],
+    "destination": {
+        "name": "Sample Destination",
+        "targetTable": "Table",
+        "connection": {}
+    }
+}
