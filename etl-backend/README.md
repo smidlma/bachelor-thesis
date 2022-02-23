@@ -1,6 +1,6 @@
 # Data structure
 Sample data sturntures used in BE with mongoDB to hold pipeline data.
-## Pipelines document
+## Pipeline document
 * Multiple sources in one pipeline
 * Two types of transformations:
     * Local - used for source table only as rows operations etc.
