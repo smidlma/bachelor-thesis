@@ -24,4 +24,5 @@ class Pipeline:
         log.debug(f'Running pipeline: {self.name}')
         df = self.sources[0].extract()
         affected = self.destination.load(df, TableOptions.REPLACE)
+        log.debug(f'Rows affected: {affected}')
         

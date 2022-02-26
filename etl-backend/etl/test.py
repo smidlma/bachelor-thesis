@@ -9,20 +9,18 @@ from schema import *
 def main():
     log.basicConfig(format='%(asctime)s - %(message)s', level=log.NOTSET)
 
-    # Test postgres connection
     connection = PostgreSQLConnection('localhost', 5432, 'smidlma', '', 'warehouse')
-    # print(connection.is_connected())
-    
     # CSV
     csvSource = CSV('Source one', 'mock.csv')
-    # print(csv.generateSample())
+    postSource = PostgreSQL('Postgres', 'importest', connection)
+    log.debug(postSource.defaultSchema)
     
     # create pipelibe
     destination = PostgreSQLDest('My dest', 'importTest', connection)
 
     pipeline = Pipeline('Move pipeline')
 
-    pipeline.addSource(csvSource)
+    pipeline.addSource(postSource)
     pipeline.setDestination(destination)
 
     pipeline.run()

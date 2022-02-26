@@ -47,17 +47,21 @@ class CSV(Source):
     def extract(self) -> pd.DataFrame:
         return pd.read_csv(self.filePath)
 
+
 # PostgreSQL class
 class PostgreSQL(Source):
     def __init__(self, name: str, tableName: str, connection: PostgreSQLConnection) -> None:
-        self.tableName = tableName
+        self.tableName = tableName.lower()
         self.connection = connection
-
         super().__init__(name)
 
     def testConnection(self) -> bool:
         return self.connection.isConnected()
 
     def generateSample(self) -> pd.DataFrame:
-        self.df_sample = pd.read_sql(f'SELECT * FROM {self.tableName};')
+        self.df_sample = pd.read_sql_query(
+            f'SELECT * FROM {self.tableName} LIMIT 1;', self.connection.con)
         return self.df_sample
+
+    def extract(self) -> pd.DataFrame:
+        return pd.read_sql_query(f'SELECT * FROM {self.tableName};', self.connection.con)

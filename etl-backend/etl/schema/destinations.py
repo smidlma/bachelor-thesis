@@ -12,7 +12,7 @@ class TableOptions(Enum):
 class Destination:
     def __init__(self, destinationName:str, targetTable:str, connection:Connection) -> None:
         self.destinationName = destinationName
-        self.targetTable = targetTable
+        self.targetTable = targetTable.lower()
         self.connection = connection
     
     def load(self, df: DataFrame, tableOption:TableOptions):
