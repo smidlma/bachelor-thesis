@@ -1,83 +1,63 @@
 from os.path import exists
-
-from numpy import number
 import config
 import pandas as pd
 from pandas.io.json import build_table_schema
-import psycopg2
-from sqlalchemy import create_engine
+from .connections import *
 
 
+# Source base class with general functionality
 class Source:
-    def __init__(self, name) -> None:
-        self.name = name
-        self.defaultSchema = None
-        
+    def __init__(self, sourceName) -> None:
+        self._df_sample = None
+        self.sourceName = sourceName
+        self.defaultSchema = build_table_schema(self.generateSample())
+
+    @property
+    def df_sample(self) -> pd.DataFrame:
+        return self._df_sample
+
+    @df_sample.setter
+    def df_sample(self, data: pd.DataFrame):
+        self._df_sample = data
+
     def testConnection(self) -> bool:
         pass
 
-    def getSample(self) -> pd.DataFrame:
+    def generateSample(self) -> pd.DataFrame:
+        pass
+
+    def extract(self) -> pd.DataFrame:
         pass
 
 
-class Connection:
-    def __init__(self, host, port, user, password, database) -> None:
-        self.con = None
-        self.host = host
-        self.port = port
-        self.user = user
-        self.password = password
-        self.database = database
-    
-    def connect(self):
-        pass
-
-    def close(self):
-        if self.con is not None:
-            self.con.close()
-
-    def is_connected(self) -> bool:
-        self.connect()
-        if self.con is None:
-            return False
-        else:
-            return True
-
-
-class PostgreSQLConnection(Connection):
-    def __init__(self, host:str, port:number, user:str, password:str, database:str) -> None:
-        super().__init__(host, port, user, password, database)
-
-    def connect(self):
-        engine = create_engine(f'postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}')
-        try:
-            self.con = engine.connect()
-        except:
-            self.con = None
-        
-
+# CSV source class
 class CSV(Source):
-    def __init__(self, name:str, fileName:str) -> None:
+    def __init__(self, name: str, fileName: str) -> None:
         self.fileName = fileName
         self.filePath = f'{config.FILE_STORAGE_PATH}{self.fileName}'
-        self.defaultSchema = build_table_schema(self.getSample())
         super().__init__(name)
-    
+
     def testConnection(self) -> bool:
         return exists(self.filePath)
-    
-    def getSample(self) -> pd.DataFrame:
-        return pd.read_csv(self, nrows=1)
 
+    def generateSample(self) -> pd.DataFrame:
+        self.df_sample = pd.read_csv(self.filePath, nrows=1)
+        return self.df_sample
 
+    def extract(self) -> pd.DataFrame:
+        return pd.read_csv(self.filePath)
+
+# PostgreSQL class
 class PostgreSQL(Source):
-    def __init__(self, name:str, tableName:str, connection:Connection) -> None:
+    def __init__(self, name: str, tableName: str, connection: PostgreSQLConnection) -> None:
         self.tableName = tableName
         self.connection = connection
+
         super().__init__(name)
 
     def testConnection(self) -> bool:
-        return self.connection.is_connected()
+        return self.connection.isConnected()
 
-    def getSample(self) -> pd.DataFrame:
-        return super().getSample()
+    def generateSample(self) -> pd.DataFrame:
+        self.df_sample = pd.read_sql(f'SELECT * FROM {self.tableName};')
+        return self.df_sample
