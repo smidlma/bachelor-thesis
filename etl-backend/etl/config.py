@@ -1,1 +1,1 @@
-FILE_STORAGE_PATH = 'etl/file-storage/'
+FILE_STORAGE_PATH = 'file-storage/'
