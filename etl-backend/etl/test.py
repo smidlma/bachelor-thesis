@@ -1,4 +1,3 @@
-
 import logging as log
 import pandas as pd
 from pandas.io.json import build_table_schema
@@ -9,11 +8,11 @@ import mongoengine as mongo
 
 
 def main():
-
+    pass
     # connect to mongo
     # mongo.connect('mongo-etl')
     # init loger
-    log.basicConfig(format='%(asctime)s - %(message)s', level=log.NOTSET)
+    # log.basicConfig(format='%(asctime)s - %(message)s', level=log.NOTSET)
 
     # connection = PostgreSQLConnection(
     #     host='localhost', port=5432, user='smidlma', password='', database='warehouse')
@@ -34,7 +33,7 @@ def main():
     # pg = PostgreSQLConnection.objects(host='localhost').first()
     # pg.connect()
 
-    pipeline = Pipeline('Move pipeline')
+    # pipeline = Pipeline('Move pipeline')
 
     # pipeline.addSource(csvSource)
     # pipeline.setDestination(destination)

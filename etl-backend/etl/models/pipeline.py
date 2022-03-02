@@ -28,3 +28,4 @@ class Pipeline(mongo.Document):
         df = self.sources[0].extract()
         affected = self.destination.load(df, InsertOption.REPLACE)
         log.debug(f'Rows affected: {affected}')
+        return affected

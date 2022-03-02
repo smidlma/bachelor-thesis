@@ -1,4 +1,7 @@
 from os.path import exists
+
+from numpy import delete
+from sqlalchemy import table
 import etl.config as config
 import pandas as pd
 from pandas.io.json import build_table_schema
@@ -44,9 +47,10 @@ class CSV(Source):
     filePath = mongo.StringField()
 
     def __init__(self, sourceName: str, fileName: str, **data) -> None:
-        super(CSV, self).__init__(sourceName=sourceName, fileName=fileName,
-                                  filePath=f'{config.FILE_STORAGE_PATH}{fileName}', **data)
-        # data['filePath'] = f'{config.FILE_STORAGE_PATH}{data["fileName"]}'
+        if 'filePath' not in data:
+            data['filePath'] = f'{config.FILE_STORAGE_PATH}{fileName}'
+        super(CSV, self).__init__(
+            sourceName=sourceName, fileName=fileName, **data)
 
     def testConnection(self) -> bool:
         return exists(self.filePath)
@@ -59,24 +63,29 @@ class CSV(Source):
         return pd.read_csv(self.filePath)
 
 
-# PostgreSQL class
+# PostgreSQL class, tableName must be lowerCase
 class PostgreSQL(Source):
     tableName = mongo.StringField()
     connection = mongo.ReferenceField(Connection)
 
-    def __init__(self, **data) -> None:
-        data['tableName'] = data['tableName'].lower()
+    def __init__(self, sourceName: str, tableName: str, connection: Connection, **data) -> None:
+        # data['tableName'] = data['tableName'].lower()
         print('Child constructor')
-
-        super(PostgreSQL, self).__init__(**data)
+        super(PostgreSQL, self).__init__(sourceName=sourceName,
+                                         tableName=tableName, connection=connection, **data)
 
     def testConnection(self) -> bool:
         return self.connection.isConnected()
 
     def generateSample(self) -> pd.DataFrame:
+        if not self.testConnection():
+            self.connection.connect()
+
         self.df_sample = pd.read_sql_query(
             f'SELECT * FROM {self.tableName} LIMIT 1;', self.connection.con)
         return self.df_sample
 
     def extract(self) -> pd.DataFrame:
+        if not self.testConnection():
+            self.connection.connect()
         return pd.read_sql_query(f'SELECT * FROM {self.tableName};', self.connection.con)

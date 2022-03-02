@@ -1,10 +1,12 @@
 from enum import Enum
 from pandas import DataFrame
-from .connections import Connection, PostgreSQLConnection
+from .connections import Connection
 import pandas as pd
 import mongoengine as mongo
 
-## 
+##
+
+
 class InsertOption(Enum):
     APPEND = 'append'
     REPLACE = 'replace'
@@ -24,6 +26,9 @@ class Destination(mongo.Document):
                                           targetTable=targetTable.lower(), connection=connection, **data)
 
     def load(self, df: DataFrame, tableOption: InsertOption):
+        if not self.connection.isConnected():
+            self.connection.connect()
+
         rowsAffected = df.to_sql(
             self.targetTable, self.connection.con, if_exists=tableOption.value)
         return rowsAffected
