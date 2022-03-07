@@ -22,7 +22,7 @@ class Source(mongo.Document):
 
         print('Base constructor')
         self.transformedData = None
-        self._dfSample = self.generateSample()
+        self._dfSample = self.preview()
         self.defaultSchema = build_table_schema(self.dfSample)
 
     @property
@@ -36,7 +36,7 @@ class Source(mongo.Document):
     def testConnection(self) -> bool:
         pass
 
-    def generateSample(self) -> pd.DataFrame:
+    def preview(self) -> pd.DataFrame:
         pass
 
     def extract(self) -> pd.DataFrame:
@@ -71,7 +71,7 @@ class CSV(Source):
     def testConnection(self) -> bool:
         return exists(self.filePath)
 
-    def generateSample(self) -> pd.DataFrame:
+    def preview(self) -> pd.DataFrame:
         self.dfSample = pd.read_csv(self.filePath, nrows=1)
         return self.dfSample
 
@@ -93,7 +93,7 @@ class PostgreSQL(Source):
     def testConnection(self) -> bool:
         return self.connection.isConnected()
 
-    def generateSample(self) -> pd.DataFrame:
+    def preview(self) -> pd.DataFrame:
         if not self.testConnection():
             self.connection.connect()
 
@@ -128,8 +128,8 @@ class Join(Source):
     def testConnection(self) -> bool:
         return None
 
-    def generateSample(self) -> pd.DataFrame:
-        return self.s1.generateSample().join(other=self.s2.generateSample(), on=self.on, how=self.how, lsuffix=self.lsuffix, rsuffix=self.rsuffix)
+    def preview(self) -> pd.DataFrame:
+        return self.s1.preview().join(other=self.s2.preview(), on=self.on, how=self.how, lsuffix=self.lsuffix, rsuffix=self.rsuffix)
 
     def extract(self) -> pd.DataFrame:
         return None
