@@ -28,7 +28,6 @@ class Pipeline(mongo.Document):
         self.destination = destination
 
     def runTest(self):
-
         log.debug(f'Running pipeline: {self.name}')
         df = self.sources[0].extract()
         affected = self.destination.load(df, dest.InsertOption.REPLACE)
@@ -40,11 +39,15 @@ class Pipeline(mongo.Document):
         # Run local trans of sources and save to dict
         for source in self.sources:
             transformedSource[source.id] = source.runTransformations()
+            # log.info(source.id)
 
-        log.info(transformedSource)
+        # log.info(transformedSource)
 
         for join in self.joins:
-            join.join()
+            transformedSource[join.id] = join.join(transformedSource.get(
+                join.s1.id), transformedSource.get(join.s2.id))
+
+            log.info(transformedSource[join.id])
 
     def moveToDestination(self):
         pass

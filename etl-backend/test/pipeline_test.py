@@ -74,3 +74,7 @@ def test_global_transformations():
     pip.addSource(csv2)
     pip.save()
     pip.run()
+
+def test_load_pip_and_run():
+    pipeline = Pipeline.objects(name='My pip').first()
+    pipeline.run()

@@ -113,16 +113,15 @@ class Join(Source):
     s2 = mongo.ReferenceField('Source')
     how = mongo.StringField()
     on = mongo.StringField()
-    lsuffix = mongo.StringField(default='left')
-    rsuffix = mongo.StringField(default='right')
+    lsuffix = mongo.StringField(default='_left')
+    rsuffix = mongo.StringField(default='_right')
 
     def __init__(self, *args, **values):
         super().__init__(*args, **values)
 
-    def join(self) -> pd.DataFrame:
-        resDf = self.s1.transformedData.join(
-            other=self.s2.transformedData, on=self.on, how=self.how, lsuffix=self.lsuffix, rsuffix=self.rsuffix)
-        log.info(resDf)
+    def join(self, df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
+        resDf = df1.join(
+            other=df2, on=self.on, how=self.how, lsuffix=self.lsuffix, rsuffix=self.rsuffix)
         return resDf
 
     def testConnection(self) -> bool:
