@@ -1,6 +1,6 @@
 from enum import Enum
 from pandas import DataFrame
-from .connections import Connection
+import etl.models.connections as con
 import pandas as pd
 import mongoengine as mongo
 
@@ -17,11 +17,11 @@ class InsertOption(Enum):
 class Destination(mongo.Document):
     destinationName = mongo.StringField()
     targetTable = mongo.StringField()
-    connection = mongo.ReferenceField(Connection)
+    connection = mongo.ReferenceField(con.Connection)
 
     meta = {'allow_inheritance': True}
 
-    def __init__(self, destinationName: str, targetTable: str, connection: Connection, **data) -> None:
+    def __init__(self, destinationName: str, targetTable: str, connection: con.Connection, **data) -> None:
         super(Destination, self).__init__(destinationName=destinationName,
                                           targetTable=targetTable.lower(), connection=connection, **data)
 
@@ -36,6 +36,6 @@ class Destination(mongo.Document):
 
 # PostgreSQL destination class
 class PostgreSQLDest(Destination):
-    def __init__(self, destinationName: str, targetTable: str, connection: Connection, **data) -> None:
+    def __init__(self, destinationName: str, targetTable: str, connection: con.Connection, **data) -> None:
         super(PostgreSQLDest, self).__init__(destinationName=destinationName,
                                              targetTable=targetTable.lower(), connection=connection, **data)
