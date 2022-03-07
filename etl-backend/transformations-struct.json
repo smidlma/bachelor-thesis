@@ -1,0 +1,39 @@
+[
+  { "name": "UnitCorversion", "from": "", "to": "", "col": "" },
+  { "name": "Validate", "cols": [{ "name": "regex" }] },
+  {
+    "name": "FillOrRemove"
+  },
+  {
+    "name": "Join",
+    "source1": {},
+    "source2": {},
+    "how": "Left",
+    "on": "id",
+    "rprefix": "_r",
+    "lprefix": "_l"
+  },
+  {
+    "name": "Sort",
+    "cols": [],
+    "asc": true
+  },
+  {
+    "name": "Mask",
+    "cols": [],
+    "maskSymbol": ""
+  },
+  {
+    "name": "Filter",
+    "cols": [
+      {
+        "birth": {
+          "type": "DATE",
+          "operator": "BETWEEN",
+          "v1": "2020",
+          "v2": "2021"
+        }
+      }
+    ]
+  }
+]

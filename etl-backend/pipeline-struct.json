@@ -5,7 +5,7 @@
             "name": "Sample Source CSV",
             "type": "CSV",
             "filePath": "/file.csv",
-            "schema": {},
+            "defaultSchema": {},
             "transformations": [
                 {}
             ]
@@ -19,15 +19,13 @@
                 "user": "User",
                 "password": "password"
             },
-            "schema": {},
+            "defaultSchema": {},
             "transformations": [
                 {}
             ]
         }
     ],
-    "transformations": [
-        {}
-    ],
+    "joiner": [],
     "destination": {
         "name": "Sample Destination",
         "targetTable": "Table",
