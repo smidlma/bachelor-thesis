@@ -6,7 +6,7 @@ import {
   NLayoutFooter, NMenu, darkTheme,
   NConfigProvider,
   NLayoutSider, GlobalTheme,
-  NLayoutContent, NGrid, NGridItem, NH5
+  NLayoutContent, NGrid, NGridItem, NH5, NPageHeader, NSpace, NAvatar
 } from 'naive-ui'
 import { ref } from 'vue';
 
@@ -33,39 +33,22 @@ const theme = ref<GlobalTheme | null>(darkTheme)
 <template>
   <NConfigProvider :theme="theme">
     <NLayout>
-      <NLayoutHeader
-        bordered
-        class="s-nav-header"
-      >
-        <NGrid
-          cols="12"
-          style="align-items: center;"
-        >
-          <NGridItem span="10">
-            <h1>ETL tool</h1>
-            <!-- <NH1>ETL tool</NH1> -->
-          </NGridItem>
-          <NGridItem>
-            <NButton>Create pipeline</NButton>
-          </NGridItem>
-          <NGridItem>
-            <div>
-              <NButton
-                v-if="theme"
-                @click="theme = null"
-              >
-                Light
-              </NButton>
-
-              <NButton
-                v-else
-                @click="theme = darkTheme"
-              >
-                Dark
-              </NButton>
-            </div>
-          </NGridItem>
-        </NGrid>
+      <NLayoutHeader bordered class="s-nav-header">
+        <NPageHeader>
+          <template #title>Uploaded Files</template>
+          <template #avatar>
+            <NAvatar
+              src="https://cdnimg103.lizhi.fm/user/2017/02/04/2583325032200238082_160x160.jpg"
+            />
+          </template>
+          <template #extra>
+            <NSpace>
+              <NButton>Create pipeline</NButton>
+              <NButton v-if="theme" @click="theme = null">Light</NButton>
+              <NButton v-else @click="theme = darkTheme">Dark</NButton>
+            </NSpace>
+          </template>
+        </NPageHeader>
       </NLayoutHeader>
 
       <NLayout has-sider>
@@ -77,20 +60,13 @@ const theme = ref<GlobalTheme | null>(darkTheme)
           :width="240"
           :native-scrollbar="false"
         >
-          <NMenu
-            :collapsed-width="64"
-            :collapsed-icon-size="22"
-            :options="menuOptions"
-          />
+          <NMenu :collapsed-width="64" :collapsed-icon-size="22" :options="menuOptions" />
         </NLayoutSider>
-        <NLayoutContent content-style="padding: 24px;">
+        <NLayoutContent content-style="padding: 24px; min-height: 900px">
           <router-view />
         </NLayoutContent>
       </NLayout>
-      <NLayoutFooter
-        bordered
-        style="padding: 12px;"
-      >
+      <NLayoutFooter bordered style="padding: 12px;">
         <NH5>@Martin Smidl</NH5>
       </NLayoutFooter>
     </NLayout>
