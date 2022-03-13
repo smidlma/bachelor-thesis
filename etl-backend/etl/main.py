@@ -1,9 +1,15 @@
-from fastapi import FastAPI, WebSocket
+import os
+from fastapi import FastAPI, File, Request, UploadFile, WebSocket
 from fastapi.responses import HTMLResponse
+import mongoengine as mongo
+from etl.models.pipeline import Pipeline
+import logging as log
+import etl.config as config
+import etl.websocket as ws
 
 app = FastAPI()
-
-print('Hello world')
+app.include_router(ws.router)
+mongo.connect('mongotest')
 
 html = """
 <!DOCTYPE html>
@@ -43,14 +49,51 @@ html = """
 @app.get("/")
 async def get():
     return HTMLResponse(html)
+    # return {file.filename}
 
-@app.get("/test")
+########## Manage pipelines ##########
+@app.get("/api/pipelines")
 async def get():
-    return {"Hello" : "World"}
+    pip = Pipeline.objects()
+    if pip is None:
+        return {"Error": "Not found"}
+    # return {"id": pip.id, "name": pip.name, "sources": "s"}
+    # d = {"id": pip.id.__str__()}
+    # print(d)
 
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(f"Message text was: {data}")
+    return pip.to_json()
+
+
+@app.post("/api/pipelines")
+async def createPipeline():
+    return {"Not Implemented"}
+
+########## Manage connections ##########
+@app.get("/api/connections")
+async def getConnections():
+    return {"Not Implemented"}
+
+
+@app.post("/app/connections")
+async def createConnection():
+    return {"Not Implemented"}
+
+########## Manage files ##########
+@app.get("/api/files")
+async def getFiles():
+    dir_name = config.FILE_STORAGE_PATH
+    files = list()
+    list_of_files = filter(lambda x: os.path.isfile(os.path.join(dir_name, x)),
+                           os.listdir(dir_name))
+    files_with_size = [(file_name, os.stat(os.path.join(dir_name, file_name)).st_size)
+                       for file_name in list_of_files]
+    print(files_with_size)
+    for fileName, fileSize in files_with_size:
+        files.append({"fileName": fileName, "fileSize": fileSize})
+
+    return files
+
+
+@app.post("/api/files/upload")
+async def uploadFile(file: UploadFile):
+    return {"Not Implemented"}
