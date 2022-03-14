@@ -3,6 +3,7 @@ from pandas import DataFrame
 import etl.models.connections as con
 import pandas as pd
 import mongoengine as mongo
+from bson import ObjectId
 
 ##
 
@@ -14,7 +15,8 @@ class InsertOption(Enum):
 
 
 # Destination base class for general functionality
-class Destination(mongo.Document):
+class Destination(mongo.EmbeddedDocument):
+    id = mongo.ObjectIdField(default=ObjectId)
     destinationName = mongo.StringField()
     targetTable = mongo.StringField()
     connection = mongo.ReferenceField(con.Connection)

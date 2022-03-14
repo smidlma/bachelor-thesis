@@ -7,12 +7,14 @@ import etl.models.transformations as tr
 import etl.models.connections as con
 import mongoengine as mongo
 import logging as log
+from bson import ObjectId
 
 
 # Source base class with general functionality
-class Source(mongo.Document):
+class Source(mongo.EmbeddedDocument):
+    id = mongo.ObjectIdField(default=ObjectId)
     name = mongo.StringField()
-    transformations = mongo.ListField(mongo.ReferenceField(tr.Transformation))
+    transformations = mongo.EmbeddedDocumentListField(tr.Transformation)
     mappedSchema = mongo.DictField()
 
     meta = {'allow_inheritance': True}
@@ -109,8 +111,8 @@ class PostgreSQL(Source):
 
 # JOIN AS A SOURCE
 class Join(Source):
-    s1 = mongo.ReferenceField('Source')
-    s2 = mongo.ReferenceField('Source')
+    s1 = mongo.EmbeddedDocumentField('Source')
+    s2 = mongo.EmbeddedDocumentField('Source')
     how = mongo.StringField()
     on = mongo.StringField()
     lsuffix = mongo.StringField(default='_left')

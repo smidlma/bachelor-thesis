@@ -8,7 +8,7 @@ import {
   NLayoutSider, GlobalTheme,
   NLayoutContent, NGrid, NGridItem, NH5, NPageHeader, NSpace, NAvatar
 } from 'naive-ui'
-import { ref } from 'vue';
+import { ref, useTransitionState, getCurrentInstance, ComponentInternalInstance, onMounted } from 'vue';
 
 
 const menuOptions = [
@@ -26,6 +26,14 @@ const menuOptions = [
   }
 ]
 
+
+onMounted(() => {
+  // const { proxy } = getCurrentInstance() as ComponentInternalInstance;
+  // // @ts-ignore: Unreachable code error
+  // proxy.$socket.sendObj({ msg: "Hello" })
+
+})
+
 const theme = ref<GlobalTheme | null>(darkTheme)
 
 </script>
@@ -35,7 +43,7 @@ const theme = ref<GlobalTheme | null>(darkTheme)
     <NLayout>
       <NLayoutHeader bordered class="s-nav-header">
         <NPageHeader>
-          <template #title>Uploaded Files</template>
+          <template #title>ETL tool</template>
           <template #avatar>
             <NAvatar
               src="https://cdnimg103.lizhi.fm/user/2017/02/04/2583325032200238082_160x160.jpg"
@@ -43,7 +51,12 @@ const theme = ref<GlobalTheme | null>(darkTheme)
           </template>
           <template #extra>
             <NSpace>
-              <NButton>Create pipeline</NButton>
+              <NButton
+                @click="() => {
+                  // @ts-ignore: Unreachable code error
+                  $socket.sendObj({ msg: 'Hello' })
+                }"
+              >Create pipeline</NButton>
               <NButton v-if="theme" @click="theme = null">Light</NButton>
               <NButton v-else @click="theme = darkTheme">Dark</NButton>
             </NSpace>
@@ -62,7 +75,7 @@ const theme = ref<GlobalTheme | null>(darkTheme)
         >
           <NMenu :collapsed-width="64" :collapsed-icon-size="22" :options="menuOptions" />
         </NLayoutSider>
-        <NLayoutContent content-style="padding: 24px; min-height: 900px">
+        <NLayoutContent content-style="padding: 24px; min-height: 640px">
           <router-view />
         </NLayoutContent>
       </NLayout>

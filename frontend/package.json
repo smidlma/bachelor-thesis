@@ -11,7 +11,9 @@
     "naive-ui": "^2.26.4",
     "vfonts": "^0.0.3",
     "vue": "^3.2.25",
-    "vue-router": "^4.0.14"
+    "vue-native-websocket-vue3": "^3.1.4",
+    "vue-router": "^4.0.14",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@vicons/ionicons5": "^0.12.0",

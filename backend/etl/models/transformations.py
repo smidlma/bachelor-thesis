@@ -2,9 +2,11 @@ import mongoengine as mongo
 from numpy import source
 import pandas as pd
 import logging as log
+from bson import ObjectId
 
 
-class Transformation(mongo.Document):
+class Transformation(mongo.EmbeddedDocument):
+    id = mongo.ObjectIdField(default=ObjectId)
     name = mongo.StringField()
     position = mongo.IntField()
 

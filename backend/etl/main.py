@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, File, Request, UploadFile, WebSocket
+from fastapi import FastAPI, Request, UploadFile, WebSocket
 from fastapi.responses import HTMLResponse
 import mongoengine as mongo
 from etl.models.pipeline import Pipeline
@@ -8,8 +8,11 @@ import etl.config as config
 import etl.websocket as ws
 
 app = FastAPI()
+mongo.connect("mongotest")
+log.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s (%(filename)s:%(lineno)s)', level=log.NOTSET)
+
 app.include_router(ws.router)
-mongo.connect('mongotest')
+
 
 html = """
 <!DOCTYPE html>
@@ -45,7 +48,9 @@ html = """
 </html>
 """
 
-
+# @app.on_event('startup')
+# def startup():
+#     mongo.connect('mongotest')
 @app.get("/")
 async def get():
     return HTMLResponse(html)

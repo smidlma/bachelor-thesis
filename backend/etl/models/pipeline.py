@@ -10,9 +10,9 @@ import mongoengine as mongo
 
 class Pipeline(mongo.Document):
     name = mongo.StringField()
-    sources = mongo.ListField(mongo.ReferenceField(source.Source))
-    destination = mongo.ReferenceField(dest.Destination)
-    joins = mongo.ListField(mongo.ReferenceField(source.Join))
+    sources = mongo.EmbeddedDocumentListField(source.Source)
+    destination = mongo.EmbeddedDocumentField(dest.Destination)
+    joins = mongo.EmbeddedDocumentListField(source.Join)
 
     def __init__(self, name, sources: list[source.Source] = [], joins: list[source.Join] = [], destination=None, **data) -> None:
         super(Pipeline, self).__init__(name=name, sources=sources,
