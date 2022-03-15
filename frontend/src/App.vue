@@ -54,7 +54,7 @@ const theme = ref<GlobalTheme | null>(darkTheme)
               <NButton
                 @click="() => {
                   // @ts-ignore: Unreachable code error
-                  $socket.sendObj({ msg: 'Hello' })
+                  $socket.sendObj({ cmd: 'INIT_STATE' })
                 }"
               >Create pipeline</NButton>
               <NButton v-if="theme" @click="theme = null">Light</NButton>

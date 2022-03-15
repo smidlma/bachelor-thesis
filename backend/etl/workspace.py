@@ -25,9 +25,10 @@ class ConnectionManager:
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
 
-    async def send(self, message:dict):
+    async def send(self, data:dict):
+        resp =  {"from": "BE", "to": "FE", "data" : data}
         for connection in self.active_connections:
-            await connection.send_json(message)
+            await connection.send_json(resp)
 
 
 
@@ -42,7 +43,8 @@ class WorkSpaceManager:
         self.store = Store()
     
     async def handleMsg(self, msg: dict):
-       await self.connectionManager.send(self.store.pipeline.to_json())
+        if msg['cmd'] == Command.INIT_STATE.value:
+            await self.connectionManager.send(self.store.pipeline.to_json())
 
 
 

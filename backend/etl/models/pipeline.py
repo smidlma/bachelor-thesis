@@ -1,4 +1,3 @@
-
 import etl.models.transformations as tr
 import etl.models.sources as source
 import etl.models.destinations as dest
@@ -14,9 +13,17 @@ class Pipeline(mongo.Document):
     destination = mongo.EmbeddedDocumentField(dest.Destination)
     joins = mongo.EmbeddedDocumentListField(source.Join)
 
-    def __init__(self, name, sources: list[source.Source] = [], joins: list[source.Join] = [], destination=None, **data) -> None:
-        super(Pipeline, self).__init__(name=name, sources=sources,
-                                       joins=joins, destination=destination, **data)
+    def __init__(
+        self,
+        name,
+        sources: list[source.Source] = [],
+        joins: list[source.Join] = [],
+        destination=None,
+        **data,
+    ) -> None:
+        super(Pipeline, self).__init__(
+            name=name, sources=sources, joins=joins, destination=destination, **data
+        )
 
     def addSource(self, source: source.Source):
         self.sources.append(source)
@@ -28,10 +35,10 @@ class Pipeline(mongo.Document):
         self.destination = destination
 
     def runTest(self):
-        log.debug(f'Running pipeline: {self.name}')
+        log.debug(f"Running pipeline: {self.name}")
         df = self.sources[0].extract()
         affected = self.destination.load(df, dest.InsertOption.REPLACE)
-        log.debug(f'Rows affected: {affected}')
+        log.debug(f"Rows affected: {affected}")
         return affected
 
     def run(self):
@@ -44,10 +51,19 @@ class Pipeline(mongo.Document):
         # log.info(transformedSource)
 
         for join in self.joins:
-            transformedSource[join.id] = join.join(transformedSource.get(
-                join.s1.id), transformedSource.get(join.s2.id))
+            transformedSource[join.id] = join.join(
+                transformedSource.get(join.s1.id), transformedSource.get(join.s2.id)
+            )
 
             log.info(transformedSource[join.id])
 
     def moveToDestination(self):
         pass
+
+    def json(self):
+        return {
+            "id": self.id,
+            "sources": [s.json() for s in self.sources],
+            "destination": self.destination.json(),
+            "joins": [j.json() for j in self.joins],
+        }

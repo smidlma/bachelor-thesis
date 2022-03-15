@@ -17,12 +17,12 @@ class Source(mongo.EmbeddedDocument):
     transformations = mongo.EmbeddedDocumentListField(tr.Transformation)
     mappedSchema = mongo.DictField()
 
-    meta = {'allow_inheritance': True}
+    meta = {"allow_inheritance": True}
 
     def __init__(self, **data) -> None:
         super(Source, self).__init__(**data)
 
-        print('Base constructor')
+        print("Base constructor")
         self.transformedData = None
         self._dfSample = self.preview()
         self.defaultSchema = build_table_schema(self.dfSample)
@@ -58,6 +58,15 @@ class Source(mongo.EmbeddedDocument):
     def setSchema(self, mappedSchema):
         self.mappedSchema = mappedSchema
 
+    def json(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "defaultSchema": self.defaultSchema,
+            "mappedSchema": self.mappedSchema,
+            "transformations": [t.json() for t in self.transformations]
+        }
+
 
 # CSV source class
 class CSV(Source):
@@ -65,10 +74,9 @@ class CSV(Source):
     filePath = mongo.StringField()
 
     def __init__(self, name: str, fileName: str, **data) -> None:
-        if 'filePath' not in data:
-            data['filePath'] = f'{config.FILE_STORAGE_PATH}{fileName}'
-        super(CSV, self).__init__(
-            name=name, fileName=fileName, **data)
+        if "filePath" not in data:
+            data["filePath"] = f"{config.FILE_STORAGE_PATH}{fileName}"
+        super(CSV, self).__init__(name=name, fileName=fileName, **data)
 
     def testConnection(self) -> bool:
         return exists(self.filePath)
@@ -80,17 +88,25 @@ class CSV(Source):
     def extract(self) -> pd.DataFrame:
         return pd.read_csv(self.filePath)
 
+    def json(self):
+        res = super().json()
+        res["fileName"] = self.fileName
+        return res
+
 
 # PostgreSQL class, tableName must be lowerCase
 class PostgreSQL(Source):
     tableName = mongo.StringField()
     connection = mongo.ReferenceField(con.Connection)
 
-    def __init__(self, name: str, tableName: str, connection: con.Connection, **data) -> None:
+    def __init__(
+        self, name: str, tableName: str, connection: con.Connection, **data
+    ) -> None:
         # data['tableName'] = data['tableName'].lower()
-        print('Child constructor')
-        super(PostgreSQL, self).__init__(name=name,
-                                         tableName=tableName, connection=connection, **data)
+        print("Child constructor")
+        super(PostgreSQL, self).__init__(
+            name=name, tableName=tableName, connection=connection, **data
+        )
 
     def testConnection(self) -> bool:
         return self.connection.isConnected()
@@ -100,37 +116,68 @@ class PostgreSQL(Source):
             self.connection.connect()
 
         self.dfSample = pd.read_sql_query(
-            f'SELECT * FROM {self.tableName} LIMIT 1;', self.connection.con)
+            f"SELECT * FROM {self.tableName} LIMIT 1;", self.connection.con
+        )
         return self.dfSample
 
     def extract(self) -> pd.DataFrame:
         if not self.testConnection():
             self.connection.connect()
-        return pd.read_sql_query(f'SELECT * FROM {self.tableName};', self.connection.con)
+        return pd.read_sql_query(
+            f"SELECT * FROM {self.tableName};", self.connection.con
+        )
+
+    def json(self):
+        res = super().json()
+        res["tableName"] = self.tableName
+        res["connection"] = self.connection.json()
+        return res
 
 
 # JOIN AS A SOURCE
 class Join(Source):
-    s1 = mongo.EmbeddedDocumentField('Source')
-    s2 = mongo.EmbeddedDocumentField('Source')
+    s1 = mongo.EmbeddedDocumentField("Source")
+    s2 = mongo.EmbeddedDocumentField("Source")
     how = mongo.StringField()
     on = mongo.StringField()
-    lsuffix = mongo.StringField(default='_left')
-    rsuffix = mongo.StringField(default='_right')
+    lsuffix = mongo.StringField(default="_left")
+    rsuffix = mongo.StringField(default="_right")
 
     def __init__(self, *args, **values):
         super().__init__(*args, **values)
 
     def join(self, df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
         resDf = df1.join(
-            other=df2, on=self.on, how=self.how, lsuffix=self.lsuffix, rsuffix=self.rsuffix)
+            other=df2,
+            on=self.on,
+            how=self.how,
+            lsuffix=self.lsuffix,
+            rsuffix=self.rsuffix,
+        )
         return resDf
 
     def testConnection(self) -> bool:
         return None
 
     def preview(self) -> pd.DataFrame:
-        return self.s1.preview().join(other=self.s2.preview(), on=self.on, how=self.how, lsuffix=self.lsuffix, rsuffix=self.rsuffix)
+        return self.s1.preview().join(
+            other=self.s2.preview(),
+            on=self.on,
+            how=self.how,
+            lsuffix=self.lsuffix,
+            rsuffix=self.rsuffix,
+        )
 
     def extract(self) -> pd.DataFrame:
         return None
+
+    def json(self):
+        res = {
+            "s1": self.s1.json(),
+            "s2": self.s2.json(),
+            "how": self.how,
+            "on": self.on,
+            "lsuffix": self.lsuffix,
+            "rsuffix": self.rsuffix
+        }
+        return {**super().json(), **res}

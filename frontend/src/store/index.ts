@@ -14,6 +14,7 @@ export default createStore({
       // Heartbeat timer
       heartBeatTimer: 0,
     },
+    pipeline: null
   },
   mutations: {
     // Connection open
@@ -35,8 +36,7 @@ export default createStore({
     // Receive the message sent by the server
     SOCKET_ONMESSAGE(state, message) {
       console.log(message);
-
-      state.socket.message = message;
+      // state.socket.message = message;
     },
     // Auto reconnect
     SOCKET_RECONNECT(state, count) {

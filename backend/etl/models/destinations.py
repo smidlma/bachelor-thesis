@@ -9,9 +9,9 @@ from bson import ObjectId
 
 
 class InsertOption(Enum):
-    APPEND = 'append'
-    REPLACE = 'replace'
-    FAIL = 'fail'
+    APPEND = "append"
+    REPLACE = "replace"
+    FAIL = "fail"
 
 
 # Destination base class for general functionality
@@ -21,23 +21,45 @@ class Destination(mongo.EmbeddedDocument):
     targetTable = mongo.StringField()
     connection = mongo.ReferenceField(con.Connection)
 
-    meta = {'allow_inheritance': True}
+    meta = {"allow_inheritance": True}
 
-    def __init__(self, destinationName: str, targetTable: str, connection: con.Connection, **data) -> None:
-        super(Destination, self).__init__(destinationName=destinationName,
-                                          targetTable=targetTable.lower(), connection=connection, **data)
+    def __init__(
+        self, destinationName: str, targetTable: str, connection: con.Connection, **data
+    ) -> None:
+        super(Destination, self).__init__(
+            destinationName=destinationName,
+            targetTable=targetTable.lower(),
+            connection=connection,
+            **data
+        )
 
     def load(self, df: DataFrame, tableOption: InsertOption):
         if not self.connection.isConnected():
             self.connection.connect()
 
         rowsAffected = df.to_sql(
-            self.targetTable, self.connection.con, if_exists=tableOption.value)
+            self.targetTable, self.connection.con, if_exists=tableOption.value
+        )
         return rowsAffected
+
+    def json(self):
+        return {
+            "id": self.id,
+            "destinationName": self.destinationName,
+            "targetTable": self.targetTable,
+            "connection": self.connection.json()
+        }
 
 
 # PostgreSQL destination class
 class PostgreSQLDest(Destination):
-    def __init__(self, destinationName: str, targetTable: str, connection: con.Connection, **data) -> None:
-        super(PostgreSQLDest, self).__init__(destinationName=destinationName,
-                                             targetTable=targetTable.lower(), connection=connection, **data)
+    def __init__(
+        self, destinationName: str, targetTable: str, connection: con.Connection, **data
+    ) -> None:
+        super(PostgreSQLDest, self).__init__(
+            destinationName=destinationName,
+            targetTable=targetTable.lower(),
+            connection=connection,
+            **data
+        )
+

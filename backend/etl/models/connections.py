@@ -12,11 +12,19 @@ class Connection(mongo.Document):
     password = mongo.StringField()
     database = mongo.StringField()
 
-    meta = {'allow_inheritance': True}
+    meta = {"allow_inheritance": True}
 
-    def __init__(self, host: str, port: int, user: str, password: str, database: str, **data) -> None:
-        super(Connection, self).__init__(host=host, port=port,
-                                         user=user, password=password, database=database, **data)
+    def __init__(
+        self, host: str, port: int, user: str, password: str, database: str, **data
+    ) -> None:
+        super(Connection, self).__init__(
+            host=host,
+            port=port,
+            user=user,
+            password=password,
+            database=database,
+            **data,
+        )
         self.con = None
 
     def connect(self):
@@ -32,14 +40,31 @@ class Connection(mongo.Document):
         else:
             return True
 
+    def json(self):
+        return {
+            "host": self.host,
+            "port": self.port,
+            "user": self.user,
+            "password": self.password,
+            "database": self.database
+        }
+
 
 class PostgreSQLConnection(Connection):
-    def __init__(self, host: str, port: int, user: str, password: str, database: str, **data) -> None:
-        super().__init__(host=host, port=port, user=user,
-                         password=password, database=database, **data)
+    def __init__(
+        self, host: str, port: int, user: str, password: str, database: str, **data
+    ) -> None:
+        super().__init__(
+            host=host,
+            port=port,
+            user=user,
+            password=password,
+            database=database,
+            **data,
+        )
 
     def connect(self) -> bool:
-        connection_string = f'postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}'
+        connection_string = f"postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
         log.debug(connection_string)
         engine = create_engine(connection_string)
         try:

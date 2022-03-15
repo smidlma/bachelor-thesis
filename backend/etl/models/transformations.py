@@ -18,6 +18,9 @@ class Transformation(mongo.EmbeddedDocument):
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         pass
 
+    def json(self):
+        return {"id": str(self.id), "name": self.name, "position": self.position}
+
 
 class Sort(Transformation):
     columns = mongo.ListField(mongo.StringField())
@@ -30,7 +33,11 @@ class Sort(Transformation):
         log.info(f'RUNNING SORT:,{self.columns}, {self.ascending}')
         return df.sort_values(by=self.columns, ascending=self.ascending)
 
-
+    def json(self):
+        res =  super().json()
+        res["columns"] = self.columns
+        res["ascending"] = self.ascending
+        return res
 
 
 # Mask single or multiple cols with ####
@@ -43,6 +50,11 @@ class MaskColumn(Transformation):
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         df[self.columns] = "####"
         return df
+
+    def json(self):
+        res =  super().json()
+        res["columns"] = self.columns
+        return res
 
 
 # Drop single or multiple cols
@@ -62,7 +74,7 @@ class Validate(Transformation):
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         return super().transform(df)
 
-# {"result" : {""}}
+
 class Filter(Transformation):
     columns = mongo.DictField()
 
