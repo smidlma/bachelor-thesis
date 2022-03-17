@@ -15,7 +15,8 @@ class Source(mongo.EmbeddedDocument):
     id = mongo.ObjectIdField(default=ObjectId)
     name = mongo.StringField()
     transformations = mongo.EmbeddedDocumentListField(tr.Transformation)
-    mappedSchema = mongo.DictField()
+    mappedSchema = mongo.DictField(default={"fields": [], "primaryKey": []})
+    defaultSchema = mongo.DictField()
 
     meta = {"allow_inheritance": True}
 
@@ -64,7 +65,7 @@ class Source(mongo.EmbeddedDocument):
             "name": self.name,
             "defaultSchema": self.defaultSchema,
             "mappedSchema": self.mappedSchema,
-            "transformations": [t.json() for t in self.transformations]
+            "transformations": [t.json() for t in self.transformations],
         }
 
 
@@ -178,6 +179,6 @@ class Join(Source):
             "how": self.how,
             "on": self.on,
             "lsuffix": self.lsuffix,
-            "rsuffix": self.rsuffix
+            "rsuffix": self.rsuffix,
         }
         return {**super().json(), **res}

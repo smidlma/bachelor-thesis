@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, h, onMounted, PropType, ref, watch } from 'vue'
+import { h, PropType, ref } from 'vue'
 import { Schema } from '../../types/Pipeline'
 import { pandasDataTypes } from '../../utils/pandas'
 import type Field from '../../types/Field'
@@ -11,11 +11,15 @@ import {
   NTag,
   NSelect,
 } from 'naive-ui'
-
+import useScocket from '../../use/socket'
+import { SOURCE_SCHEMA_MAPPING } from '../../utils/commands'
 const props = defineProps({
+  sourceId: { type: String },
   defaultSchema: { type: Object as PropType<Schema> },
   mappedSchema: { type: Object as PropType<Schema>, default: { fields: [] } },
 })
+
+const { sendToServer } = useScocket()
 
 const columns: DataTableColumns<Field> = [
   {
@@ -62,14 +66,21 @@ const columnsMapped: DataTableColumns<Field> = [
 ]
 
 const toMapped = (rowKey: any) => {
-  console.log(rowKey)
+  const data = props.defaultSchema?.fields.filter((x) =>
+    rowKey.includes(x.name)
+  )
+  const msg = {
+    sourceId: props.sourceId,
+    schema: { fields: data, primaryKey: props.defaultSchema?.primaryKey },
+  }
+  console.log(msg)
+
+  sendToServer(SOURCE_SCHEMA_MAPPING, msg)
 }
 
+const defaultSelectedKeys = props.mappedSchema.fields.map((x) => x.name)
+
 // const test: Array<Field> = [{ name: 'name', type: 'string' }]
-
-const checked = ref([])
-
-// console.log(props.defaultSchema?.fields.map((x) => x.name))
 </script>
 
 <template>
@@ -78,16 +89,17 @@ const checked = ref([])
       <NDataTable
         ref="table"
         :columns="columns"
-        :data="defaultSchema?.fields"
+        :data="props.defaultSchema?.fields"
         :row-key="(row:Field) => row.name"
         @update:checked-row-keys="toMapped"
+        :default-checked-row-keys="defaultSelectedKeys"
       />
     </NGi>
     <NGi>
       <NDataTable
         ref="table2"
         :columns="columnsMapped"
-        :data="mappedSchema.fields"
+        :data="props.mappedSchema.fields"
         :row-key="(row:Field) => row.name"
       />
     </NGi>

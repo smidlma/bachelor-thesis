@@ -1,5 +1,4 @@
 import { createStore } from 'vuex'
-// import main from "../main";
 
 export default createStore({
   state: {
@@ -20,7 +19,6 @@ export default createStore({
   mutations: {
     // Connection open
     SOCKET_ONOPEN(state, event) {
-      // main.config.globalProperties.$socket = event.currentTarget;
       state.socket.isConnected = true
       console.log('Connection open')
     },

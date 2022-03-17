@@ -12,7 +12,7 @@ interface Schema {
 }
 
 interface Source {
-  id: number
+  id: string
   name: string
   defaultSchema: Schema
   mappedSchema: Schema

@@ -13,6 +13,7 @@ const props = defineProps({
     <SSourceMapper
       :default-schema="props.source?.defaultSchema"
       :mapped-schema="props.source?.mappedSchema"
+      :source-id="props.source?.id"
     />
   </div>
 </template>

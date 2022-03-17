@@ -13,6 +13,7 @@ class Command(Enum):
     REMOVE_SOURCE = "REMOVE_SOURCE"
     ADD_TRANSFORMATION = "ADD_TRANSFORMATION"
     REMOVE_TRANSFORMATION = "REMOVE_TRANSFORMATION"
+    SOURCE_SCHEMA_MAPPING = "SOURCE_SCHEMA_MAPPING"
 
 
 class ConnectionManager:
@@ -32,16 +33,30 @@ class ConnectionManager:
             await connection.send_json(resp)
 
 
-class Store:
+class PipelineBuilder:
     def __init__(self) -> None:
         self.pipeline = Pipeline.objects(name="My pip").first()
+
+    def schemaMapping(self, data):
+        sourceId = data["sourceId"]
+        schema = data["schema"]
+        s = next(filter(lambda x: str(x.id) == sourceId, self.pipeline.sources), None)
+        s.setSchema(schema)
+        self.pipeline.save()
+        pass
 
 
 class WorkSpaceManager:
     def __init__(self) -> None:
         self.connectionManager = ConnectionManager()
-        self.store = Store()
+        self.store = PipelineBuilder()
+
+    async def sendOpenedPipeline(self):
+        await self.connectionManager.send(self.store.pipeline.json())
 
     async def handleMsg(self, msg: dict):
         if msg["cmd"] == Command.INIT_STATE.value:
-            await self.connectionManager.send(self.store.pipeline.json())
+            await self.sendOpenedPipeline()
+        elif msg["cmd"] == Command.SOURCE_SCHEMA_MAPPING.value:
+            self.store.schemaMapping(msg["data"])
+            await self.sendOpenedPipeline()

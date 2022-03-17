@@ -41,7 +41,7 @@ const pipeline = computed(() => store.getters.currentPipeline)
       </template>
       <NTabs type="line" size="large">
         <NTabPane
-          display-directive="show"
+          display-directive="if"
           v-for="(item, index) in pipeline.sources"
           :key="index"
           :name="item.name"
