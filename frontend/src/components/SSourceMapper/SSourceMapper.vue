@@ -57,8 +57,21 @@ const columnsMapped: DataTableColumns<Field> = [
         value: row.type,
         options: pandasDataTypes,
         onUpdateValue: (value) => {
-          const temp = { ...row, newType: value }
-          console.log(temp)
+          if (row.type !== value) {
+            const fields = props.mappedSchema.fields.map((x) =>
+              x.name === row.name ? { name: x.name, type: value } : x
+            )
+
+            const schema = {
+              fields: fields,
+              primaryKey: props.defaultSchema?.primaryKey,
+            }
+            const msg = {
+              schema: schema,
+              sourceId: props.sourceId,
+            }
+            sendToServer(SOURCE_SCHEMA_MAPPING, msg)
+          }
         },
       })
     },
@@ -79,8 +92,6 @@ const toMapped = (rowKey: any) => {
 }
 
 const defaultSelectedKeys = props.mappedSchema.fields.map((x) => x.name)
-
-// const test: Array<Field> = [{ name: 'name', type: 'string' }]
 </script>
 
 <template>

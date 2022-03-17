@@ -39,8 +39,8 @@ class PipelineBuilder:
 
     def schemaMapping(self, data):
         sourceId = data["sourceId"]
-        schema = data["schema"]
         s = next(filter(lambda x: str(x.id) == sourceId, self.pipeline.sources), None)
+        schema = data["schema"]
         s.setSchema(schema)
         self.pipeline.save()
         pass
