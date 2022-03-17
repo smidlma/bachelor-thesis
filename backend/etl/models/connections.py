@@ -42,6 +42,7 @@ class Connection(mongo.Document):
 
     def json(self):
         return {
+            "id": str(self.id),
             "host": self.host,
             "port": self.port,
             "user": self.user,
@@ -74,3 +75,6 @@ class PostgreSQLConnection(Connection):
             self.con = None
             log.error(e)
             return False
+
+    def json(self):
+        return super().json()

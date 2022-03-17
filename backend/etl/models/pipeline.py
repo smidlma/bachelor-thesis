@@ -62,8 +62,8 @@ class Pipeline(mongo.Document):
 
     def json(self):
         return {
-            "id": self.id,
+            "id": str(self.id),
             "sources": [s.json() for s in self.sources],
-            "destination": self.destination.json(),
+            "destination": self.destination.json() if self.destination else None,
             "joins": [j.json() for j in self.joins],
         }

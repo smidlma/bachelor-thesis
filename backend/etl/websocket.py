@@ -17,5 +17,5 @@ async def websocket_endpoint(websocket: WebSocket, client_id = 0):
             log.info(msg)
             await manager.handleMsg(msg)
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
+        manager.connectionManager.disconnect(websocket)
         # await manager.broadcast(f"Client #{client_id} left the chat")

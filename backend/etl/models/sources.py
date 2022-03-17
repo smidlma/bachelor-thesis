@@ -60,7 +60,7 @@ class Source(mongo.EmbeddedDocument):
 
     def json(self):
         return {
-            "id": self.id,
+            "id": str(self.id),
             "name": self.name,
             "defaultSchema": self.defaultSchema,
             "mappedSchema": self.mappedSchema,

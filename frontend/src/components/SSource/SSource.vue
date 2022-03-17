@@ -1,17 +1,20 @@
-<script setup lang='ts'>
+<script setup lang="ts">
+import { PropType } from 'vue'
+import { Source } from '../../types/Pipeline'
+import SSourceMapper from '../SSourceMapper/SSourceMapper.vue'
 
 const props = defineProps({
-    name: {
-        type: String,
-        default: 'Name'
-    }
+  source: { type: Object as PropType<Source> },
 })
 </script>
 
 <template>
-  <div>Source comp</div>
-</template>  
+  <div>
+    <SSourceMapper
+      :default-schema="props.source?.defaultSchema"
+      :mapped-schema="props.source?.mappedSchema"
+    />
+  </div>
+</template>
 
-    
-<style>
-</style>
+<style></style>

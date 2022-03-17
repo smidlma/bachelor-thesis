@@ -44,7 +44,7 @@ class Destination(mongo.EmbeddedDocument):
 
     def json(self):
         return {
-            "id": self.id,
+            "id": str(self.id),
             "destinationName": self.destinationName,
             "targetTable": self.targetTable,
             "connection": self.connection.json()
@@ -62,4 +62,5 @@ class PostgreSQLDest(Destination):
             connection=connection,
             **data
         )
-
+    def json(self):
+        return super().json()

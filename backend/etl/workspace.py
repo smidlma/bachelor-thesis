@@ -1,22 +1,23 @@
 from enum import Enum
+from typing import List
 from fastapi import WebSocket
 from etl.models.pipeline import Pipeline
 
+
 class Command(Enum):
-    INIT_STATE = 'INIT_STATE'
-    OPEN_PIPELINE = 'OPEN_PIPELINE'
-    CLOSE_PIPELINE = 'OPEN_PIPELINE'
-    RUN_PIPELINE = 'RUN_PIPELINE'
-    ADD_SOURCE = 'ADD_SOURCE'
-    REMOVE_SOURCE = 'REMOVE_SOURCE'
-    ADD_TRANSFORMATION = 'ADD_TRANSFORMATION'
-    REMOVE_TRANSFORMATION = 'REMOVE_TRANSFORMATION'
+    INIT_STATE = "INIT_STATE"
+    OPEN_PIPELINE = "OPEN_PIPELINE"
+    CLOSE_PIPELINE = "OPEN_PIPELINE"
+    RUN_PIPELINE = "RUN_PIPELINE"
+    ADD_SOURCE = "ADD_SOURCE"
+    REMOVE_SOURCE = "REMOVE_SOURCE"
+    ADD_TRANSFORMATION = "ADD_TRANSFORMATION"
+    REMOVE_TRANSFORMATION = "REMOVE_TRANSFORMATION"
 
 
-    
 class ConnectionManager:
     def __init__(self):
-        self.active_connections:list[WebSocket] = []
+        self.active_connections: List[WebSocket] = []
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
@@ -25,28 +26,22 @@ class ConnectionManager:
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
 
-    async def send(self, data:dict):
-        resp =  {"from": "BE", "to": "FE", "data" : data}
+    async def send(self, data: dict):
+        resp = {"from": "BE", "to": "FE", "data": data}
         for connection in self.active_connections:
             await connection.send_json(resp)
 
 
-
 class Store:
     def __init__(self) -> None:
-        self.pipeline = Pipeline.objects(name='My pip').first()
+        self.pipeline = Pipeline.objects(name="My pip").first()
 
 
 class WorkSpaceManager:
     def __init__(self) -> None:
         self.connectionManager = ConnectionManager()
         self.store = Store()
-    
+
     async def handleMsg(self, msg: dict):
-        if msg['cmd'] == Command.INIT_STATE.value:
-            await self.connectionManager.send(self.store.pipeline.to_json())
-
-
-
-
-
+        if msg["cmd"] == Command.INIT_STATE.value:
+            await self.connectionManager.send(self.store.pipeline.json())
