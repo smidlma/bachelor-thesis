@@ -47,7 +47,7 @@ class Connection(mongo.Document):
             "port": self.port,
             "user": self.user,
             "password": self.password,
-            "database": self.database
+            "database": self.database,
         }
 
 
@@ -66,6 +66,7 @@ class PostgreSQLConnection(Connection):
 
     def connect(self) -> bool:
         connection_string = f"postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
+        print(connection_string)
         log.debug(connection_string)
         engine = create_engine(connection_string)
         try:
@@ -74,6 +75,7 @@ class PostgreSQLConnection(Connection):
         except Exception as e:
             self.con = None
             log.error(e)
+            print(e)
             return False
 
     def json(self):

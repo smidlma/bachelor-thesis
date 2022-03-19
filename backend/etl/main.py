@@ -1,12 +1,24 @@
 import os
+from typing import Optional
 from fastapi import FastAPI, Request, UploadFile, WebSocket
 from fastapi.responses import HTMLResponse
 import mongoengine as mongo
+from etl.models.connections import Connection, PostgreSQLConnection
 from etl.models.pipeline import Pipeline
 import logging as log
 import etl.config as config
 import etl.websocket as ws
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+
+class ConnectionModel(BaseModel):
+    host: str
+    port: int
+    user: str
+    password: Optional[str] = None
+    database: str
+
 
 app = FastAPI()
 origins = [
@@ -93,14 +105,33 @@ async def createPipeline():
 ########## Manage connections ##########
 @app.get("/api/connections")
 async def getConnections():
-    return {"Not Implemented"}
+    connections = Connection.objects()
+    return [c.json() for c in connections]
 
 
-@app.post("/app/connections")
+@app.post("/api/connections")
 async def createConnection():
     return {"Not Implemented"}
 
 
+@app.post("/api/connections/test")
+async def testConnecion(body: ConnectionModel):
+    connection = PostgreSQLConnection(
+        host=body.host,
+        port=body.port,
+        user=body.user,
+        password=body.password,
+        database=body.database,
+    )
+
+    if connection.connect():
+        return {"connected": True}
+    else:
+        return {"connected": False}
+
+
+# postgresql+psycopg2://smidlma:@localhost:5432/warehouse
+# postgresql+psycopg2://smidlma:@localhost:5423/warehouse
 ########## Manage files ##########
 @app.get("/api/files")
 async def getFiles():
