@@ -3,13 +3,14 @@ from etl.workspace import WorkSpaceManager
 import logging as log
 import mongoengine as mongo
 
-mongo.connect('mongotest')
+mongo.connect("mongotest")
 
 router = APIRouter()
 manager = WorkSpaceManager()
 
+
 @router.websocket("/ws", format)
-async def websocket_endpoint(websocket: WebSocket, client_id = 0):
+async def websocket_endpoint(websocket: WebSocket, client_id=0):
     await manager.connectionManager.connect(websocket)
     try:
         while True:

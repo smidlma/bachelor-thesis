@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { h, PropType, ref } from 'vue'
+import { h, PropType } from 'vue'
 import { Schema } from '../../types/Pipeline'
 import { pandasDataTypes } from '../../utils/pandas'
 import type Field from '../../types/Field'
@@ -98,7 +98,7 @@ const defaultSelectedKeys = props.mappedSchema.fields.map((x) => x.name)
   <NGrid x-gap="12" cols="s:1 m:2" responsive="screen">
     <NGi>
       <NDataTable
-        ref="table"
+        :row-class-name="() => 's-table__row'"
         :columns="columns"
         :data="props.defaultSchema?.fields"
         :row-key="(row:Field) => row.name"
@@ -108,7 +108,7 @@ const defaultSelectedKeys = props.mappedSchema.fields.map((x) => x.name)
     </NGi>
     <NGi>
       <NDataTable
-        ref="table2"
+        :row-class-name="() => 's-table__row'"
         :columns="columnsMapped"
         :data="props.mappedSchema.fields"
         :row-key="(row:Field) => row.name"
@@ -116,5 +116,7 @@ const defaultSelectedKeys = props.mappedSchema.fields.map((x) => x.name)
     </NGi>
   </NGrid>
 </template>
-
-<style></style>
+<style lang="sass" scoped>
+:deep(.s-table__row td)
+  height: 64px
+</style>

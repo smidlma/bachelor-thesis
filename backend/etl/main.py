@@ -6,10 +6,25 @@ from etl.models.pipeline import Pipeline
 import logging as log
 import etl.config as config
 import etl.websocket as ws
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+origins = [
+    "http://localhost:3000",
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 mongo.connect("mongotest")
-log.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s (%(filename)s:%(lineno)s)', level=log.NOTSET)
+log.basicConfig(
+    format="%(asctime)s [%(levelname)s] %(message)s (%(filename)s:%(lineno)s)",
+    level=log.NOTSET,
+)
 
 app.include_router(ws.router)
 
@@ -56,6 +71,7 @@ async def get():
     return HTMLResponse(html)
     # return {file.filename}
 
+
 ########## Manage pipelines ##########
 @app.get("/api/pipelines")
 async def get():
@@ -73,6 +89,7 @@ async def get():
 async def createPipeline():
     return {"Not Implemented"}
 
+
 ########## Manage connections ##########
 @app.get("/api/connections")
 async def getConnections():
@@ -83,15 +100,19 @@ async def getConnections():
 async def createConnection():
     return {"Not Implemented"}
 
+
 ########## Manage files ##########
 @app.get("/api/files")
 async def getFiles():
     dir_name = config.FILE_STORAGE_PATH
     files = list()
-    list_of_files = filter(lambda x: os.path.isfile(os.path.join(dir_name, x)),
-                           os.listdir(dir_name))
-    files_with_size = [(file_name, os.stat(os.path.join(dir_name, file_name)).st_size)
-                       for file_name in list_of_files]
+    list_of_files = filter(
+        lambda x: os.path.isfile(os.path.join(dir_name, x)), os.listdir(dir_name)
+    )
+    files_with_size = [
+        (file_name, os.stat(os.path.join(dir_name, file_name)).st_size)
+        for file_name in list_of_files
+    ]
     print(files_with_size)
     for fileName, fileSize in files_with_size:
         files.append({"fileName": fileName, "fileSize": fileSize})

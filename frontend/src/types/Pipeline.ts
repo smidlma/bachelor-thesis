@@ -17,6 +17,7 @@ interface Source {
   defaultSchema: Schema
   mappedSchema: Schema
   transformations: Array<Object>
+  preview: Array<Object>
 }
 
 export { Pipeline, Transformation, Schema, Source }

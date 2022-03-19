@@ -1,4 +1,5 @@
 from email.policy import default
+import json
 from os.path import exists
 import etl.config as config
 import pandas as pd
@@ -60,12 +61,19 @@ class Source(mongo.EmbeddedDocument):
         self.mappedSchema = mappedSchema
 
     def json(self):
+        # print(self.dfSample.to_dict(orient="records"))
+        # print("########")
         return {
             "id": str(self.id),
             "name": self.name,
             "defaultSchema": self.defaultSchema,
             "mappedSchema": self.mappedSchema,
             "transformations": [t.json() for t in self.transformations],
+            "preview": json.loads(
+                self.dfSample.to_json(
+                    orient="records",
+                )
+            ),
         }
 
 
@@ -83,7 +91,7 @@ class CSV(Source):
         return exists(self.filePath)
 
     def preview(self) -> pd.DataFrame:
-        self.dfSample = pd.read_csv(self.filePath, nrows=1)
+        self.dfSample = pd.read_csv(self.filePath, nrows=5)
         return self.dfSample
 
     def extract(self) -> pd.DataFrame:
