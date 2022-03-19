@@ -11,11 +11,14 @@ import {
   NDivider,
 } from 'naive-ui'
 import useRest from '../../use/rest'
+import useSocket from '../../use/socket'
+import { ADD_SOURCE } from '../../utils/commands'
+import { Add } from '@vicons/ionicons5'
 const props = defineProps({
   source: { type: Object as PropType<Source>, default: null },
 })
 const rest = useRest()
-
+const socket = useSocket()
 const files: any = ref([])
 const connections: any = ref([])
 const isTested = ref(false)
@@ -30,10 +33,13 @@ onMounted(async () => {
   console.log(c)
 })
 const form = ref({
-  sourceName: '',
+  name: '',
+  fileName: '',
 })
-
-const addSource = (type: string) => {}
+const a = { v: 1, f: 3 }
+const addSource = (type: string) => {
+  socket.sendToServer(ADD_SOURCE, { sourceType: type, ...form.value })
+}
 </script>
 
 <template>
@@ -44,11 +50,15 @@ const addSource = (type: string) => {}
         <NDivider></NDivider>
         <NSpace vertical size="large">
           <NInput
-            v-model:value="form.sourceName"
+            v-model:value="form.name"
             placeholder="Name of the source"
           ></NInput>
-          <NSelect :options="files"></NSelect>
-          <NButton>Add</NButton>
+          <NSelect
+            v-model:value="form.fileName"
+            :options="files"
+            placeholder="Select file"
+          ></NSelect>
+          <NButton @click="addSource('csv')">Add</NButton>
         </NSpace>
       </NTabPane>
       <NTabPane name="postgresql" tab="PostgreSQL">

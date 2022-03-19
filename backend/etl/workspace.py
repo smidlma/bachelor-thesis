@@ -2,6 +2,7 @@ from enum import Enum
 from typing import List
 from fastapi import WebSocket
 from etl.models.pipeline import Pipeline
+from etl.models.sources import CSV
 
 
 class Command(Enum):
@@ -46,6 +47,12 @@ class PipelineBuilder:
         self.pipeline.save()
         pass
 
+    def addSource(self, data):
+        if data["sourceType"] == "csv":
+            s = CSV(name=data["name"], fileName=data["fileName"])
+            self.pipeline.addSource(s)
+            self.pipeline.save()
+
 
 class WorkSpaceManager:
     def __init__(self) -> None:
@@ -60,4 +67,7 @@ class WorkSpaceManager:
             await self.sendOpenedPipeline()
         elif msg["cmd"] == Command.SOURCE_SCHEMA_MAPPING.value:
             self.store.schemaMapping(msg["data"])
+            await self.sendOpenedPipeline()
+        elif msg["cmd"] == Command.ADD_SOURCE.value:
+            self.store.addSource(msg["data"])
             await self.sendOpenedPipeline()
