@@ -10,7 +10,7 @@ const props = defineProps({
 
 const columns = computed(() =>
   props.schema?.fields.map((x) => {
-    return { title: x.name.toUpperCase(), key: x.name.toLowerCase() }
+    return { title: x.name.toUpperCase(), key: x.name }
   })
 )
 </script>

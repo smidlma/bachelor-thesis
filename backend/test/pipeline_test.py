@@ -1,4 +1,6 @@
+from traceback import print_tb
 from turtle import position
+from unicodedata import name
 from etl import config
 import etl.models.connections as conn
 import etl.models.sources as source
@@ -79,3 +81,10 @@ def test_global_transformations():
 def test_load_pip_and_run():
     pipeline = Pipeline.objects(name="My pip").first()
     pipeline.run()
+
+
+def test_delimetr():
+    csv = source.CSV(name="asdf", fileName="PatientCorePopulatedTable.txt")
+    csv2 = source.CSV(name="troll", fileName="mock.csv")
+    log.info(csv.defaultSchema)
+    log.info(csv2.defaultSchema)

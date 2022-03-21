@@ -12,48 +12,65 @@ import {
   NLayoutSider,
   GlobalTheme,
   NLayoutContent,
-  NGrid,
-  NGridItem,
-  NH5,
   NPageHeader,
   NSpace,
   NAvatar,
+  MenuOption,
 } from 'naive-ui'
-import {
-  ref,
-  useTransitionState,
-  getCurrentInstance,
-  ComponentInternalInstance,
-  onMounted,
-} from 'vue'
+import { ref, h } from 'vue'
+import { RouterLink } from 'vue-router'
 
-const menuOptions = [
+const menuOptions: MenuOption[] = [
   {
-    label: 'Pipelines',
-    key: 'pipelines',
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: {
+            name: 'Home',
+          },
+        },
+        { default: () => 'Home' }
+      ),
+    key: 'home',
+    // icon: renderIcon(HomeIcon)
   },
   {
-    label: 'Connections',
-    key: 'connections',
-  },
-  {
-    label: 'Files',
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: {
+            name: 'Files',
+          },
+        },
+        { default: () => 'Files' }
+      ),
     key: 'files',
+    // icon: renderIcon(WorkIcon),
+  },
+  {
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: {
+            name: 'Editor',
+          },
+        },
+        { default: () => 'Editor' }
+      ),
+    key: 'editor',
+    // icon: renderIcon(WorkIcon),
   },
 ]
-
-onMounted(() => {
-  // const { proxy } = getCurrentInstance() as ComponentInternalInstance;
-  // // @ts-ignore: Unreachable code error
-  // proxy.$socket.sendObj({ msg: "Hello" })
-})
 
 const theme = ref<GlobalTheme | null>(darkTheme)
 </script>
 
 <template>
   <NConfigProvider :theme="theme">
-    <NLayout>
+    <NLayout position="absolute">
       <NLayoutHeader bordered class="s-nav-header">
         <NPageHeader>
           <template #title>ETL tool</template>
@@ -79,8 +96,7 @@ const theme = ref<GlobalTheme | null>(darkTheme)
           </template>
         </NPageHeader>
       </NLayoutHeader>
-
-      <NLayout has-sider>
+      <NLayout has-sider position="absolute" style="top: 64px; bottom: 64px">
         <NLayoutSider
           bordered
           show-trigger
@@ -95,12 +111,18 @@ const theme = ref<GlobalTheme | null>(darkTheme)
             :options="menuOptions"
           />
         </NLayoutSider>
-        <NLayoutContent content-style="padding: 24px; min-height: 640px">
-          <router-view />
-        </NLayoutContent>
+        <NLayout content-style="padding: 24px;">
+          <NLayoutContent>
+            <router-view />
+          </NLayoutContent>
+        </NLayout>
       </NLayout>
-      <NLayoutFooter bordered style="padding: 12px">
-        <NH5>@Martin Smidl</NH5>
+      <NLayoutFooter
+        bordered
+        position="absolute"
+        style="height: 64px; padding: 24px"
+      >
+        @Martin Smidl
       </NLayoutFooter>
     </NLayout>
   </NConfigProvider>

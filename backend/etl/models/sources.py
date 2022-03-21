@@ -63,6 +63,7 @@ class Source(mongo.EmbeddedDocument):
     def json(self):
         # print(self.dfSample.to_dict(orient="records"))
         # print("########")
+        print(self.dfSample)
         return {
             "id": str(self.id),
             "name": self.name,
@@ -91,11 +92,17 @@ class CSV(Source):
         return exists(self.filePath)
 
     def preview(self) -> pd.DataFrame:
-        self.dfSample = pd.read_csv(self.filePath, nrows=5)
+        self.dfSample = pd.read_csv(
+            self.filePath,
+            nrows=5,
+            delimiter=",|;|\t",
+            engine="python",
+            parse_dates=True,
+        )
         return self.dfSample
 
     def extract(self) -> pd.DataFrame:
-        return pd.read_csv(self.filePath)
+        return pd.read_csv(self.filePath, delimiter=",|;|\t", engine="python")
 
     def json(self):
         res = super().json()

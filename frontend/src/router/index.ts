@@ -7,8 +7,8 @@ const routes: Array<RouteRecordRaw> = [
     component: HomeView,
   },
   {
-    path: '/file',
-    name: 'File',
+    path: '/files',
+    name: 'Files',
     component: () => import('../views/FileView.vue'),
   },
   {

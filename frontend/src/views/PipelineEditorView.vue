@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, Ref } from 'vue'
 import { useStore } from 'vuex'
 
 import {
@@ -11,12 +11,25 @@ import {
   NPageHeader,
   NAvatar,
   NSpace,
+  NDrawer,
+  NDrawerContent,
 } from 'naive-ui'
 import SSource from '../components/SSource/SSource.vue'
+import SSourceConfig from '../components/SSourceConfig/SSourceConfig.vue'
+import SDestination from '../components/SDestination/SDestination.vue'
+import SDestinationConfig from '../components/SDestinationConfig.vue'
 
 const store = useStore()
 
 const pipeline = computed(() => store.getters.currentPipeline)
+
+const activeDrawer: Ref<boolean> = ref(false)
+const configItem: Ref<string> = ref('source')
+
+const openConfig = (item: string) => {
+  configItem.value = item
+  activeDrawer.value = true
+}
 </script>
 
 <template>
@@ -37,7 +50,7 @@ const pipeline = computed(() => store.getters.currentPipeline)
     <NDivider></NDivider>
     <NCard title="Sources">
       <template #header-extra>
-        <NButton>Add Source</NButton>
+        <NButton @click="openConfig('source')">Add Source</NButton>
       </template>
       <NTabs type="line" size="large">
         <NTabPane
@@ -60,10 +73,29 @@ const pipeline = computed(() => store.getters.currentPipeline)
     <NDivider></NDivider>
     <NCard title="Destination">
       <template #header-extra>
-        <NButton>Configure</NButton>
+        <NButton @click="openConfig('destination')">Configure</NButton>
       </template>
-      Dest
+      <SDestination :destination="pipeline.destination" />
     </NCard>
+    <!-- Drawer -->
+    <NDrawer placement="right" :width="612" v-model:show="activeDrawer">
+      <NDrawerContent>
+        <template v-if="configItem === 'source'" #header>
+          Source configuration
+        </template>
+        <template v-else-if="configItem === 'destination'" #header>
+          Source configuration
+        </template>
+
+        <div v-if="configItem === 'source'">
+          <SSourceConfig />
+        </div>
+        <div v-else-if="configItem === 'destination'">
+          <SDestinationConfig :destination="pipeline.destination" />
+        </div>
+      </NDrawerContent>
+    </NDrawer>
+    <!-- End of Drawer -->
   </template>
   <template v-else> No pipeline opened </template>
 </template>

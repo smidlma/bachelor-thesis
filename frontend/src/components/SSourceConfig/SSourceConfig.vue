@@ -34,7 +34,7 @@ onMounted(async () => {
 })
 const form = ref({
   name: '',
-  fileName: '',
+  fileName: null,
 })
 const a = { v: 1, f: 3 }
 const addSource = (type: string) => {
@@ -54,23 +54,23 @@ const addSource = (type: string) => {
             placeholder="Name of the source"
           ></NInput>
           <NSelect
-            v-model:value="form.fileName"
+            placeholder="Select the file"
             :options="files"
-            placeholder="Select file"
+            v-model:value="form.fileName"
           ></NSelect>
           <NButton @click="addSource('csv')">Add</NButton>
         </NSpace>
       </NTabPane>
       <NTabPane name="postgresql" tab="PostgreSQL">
         <NDivider></NDivider>
-        <NSpace vertical>
+        <NSpace vertical size="large">
           <NInput placeholder="Name of the source"></NInput>
           <NSelect
             :options="files"
             placeholder="Select from defined connections"
           >
           </NSelect>
-          <NSpace>
+          <NSpace size="large">
             <NInput placeholder="Host"></NInput>
             <NInput placeholder="Port"></NInput>
             <NInput placeholder="User"></NInput>
