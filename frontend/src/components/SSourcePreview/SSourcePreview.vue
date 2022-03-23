@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NDataTable } from 'naive-ui'
+import { NDataTable, NResult, NEmpty, NCard } from 'naive-ui'
 import { computed, PropType } from 'vue'
 import { Schema } from '../../types/Pipeline'
 
@@ -16,8 +16,21 @@ const columns = computed(() =>
 </script>
 
 <template>
-  <div>
-    <n-data-table :columns="columns" :data="props.data" />
+  <div style="padding-bottom: 18px">
+    <NDataTable
+      v-if="columns && columns.length > 0"
+      :columns="columns"
+      :data="props.data"
+    />
+
+    <n-card v-else>
+      <NResult
+        status="info"
+        title="Use source mapper"
+        description="To show data preview, you have to map source columns"
+      >
+      </NResult>
+    </n-card>
   </div>
 </template>
 

@@ -24,7 +24,7 @@ class Source(mongo.EmbeddedDocument):
     def __init__(self, **data) -> None:
         super(Source, self).__init__(**data)
 
-        print("Base constructor")
+        # print("Base constructor")
         self.transformedData = None
         self._dfSample = self.preview()
         self.defaultSchema = build_table_schema(self.dfSample)
@@ -63,7 +63,7 @@ class Source(mongo.EmbeddedDocument):
     def json(self):
         # print(self.dfSample.to_dict(orient="records"))
         # print("########")
-        print(self.dfSample)
+        # print(self.dfSample)
         return {
             "id": str(self.id),
             "name": self.name,
@@ -115,7 +115,7 @@ class PostgreSQL(Source):
         self, name: str, tableName: str, connection: con.Connection, **data
     ) -> None:
         # data['tableName'] = data['tableName'].lower()
-        print("Child constructor")
+        # print("Child constructor")
         super(PostgreSQL, self).__init__(
             name=name, tableName=tableName, connection=connection, **data
         )
