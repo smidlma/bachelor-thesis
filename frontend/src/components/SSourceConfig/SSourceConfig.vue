@@ -14,6 +14,7 @@ import useRest from '../../use/rest'
 import useSocket from '../../use/socket'
 import { ADD_SOURCE } from '../../utils/commands'
 import { Add } from '@vicons/ionicons5'
+import SConnection from '../SConnection.vue'
 const props = defineProps({
   source: { type: Object as PropType<Source>, default: null },
 })
@@ -30,15 +31,16 @@ onMounted(async () => {
   })
 
   const c = await rest.getConnections()
-  console.log(c)
+  connections.value = c.map((x) => {
+    return { label: x.database, value: x.id }
+  })
 })
-const form = ref({
+const formCSV = ref({
   name: '',
   fileName: null,
 })
-const a = { v: 1, f: 3 }
 const addSource = (type: string) => {
-  socket.sendToServer(ADD_SOURCE, { sourceType: type, ...form.value })
+  socket.sendToServer(ADD_SOURCE, { sourceType: type, ...formCSV.value })
 }
 </script>
 
@@ -50,13 +52,13 @@ const addSource = (type: string) => {
         <NDivider></NDivider>
         <NSpace vertical size="large">
           <NInput
-            v-model:value="form.name"
+            v-model:value="formCSV.name"
             placeholder="Name of the source"
           ></NInput>
           <NSelect
             placeholder="Select the file"
             :options="files"
-            v-model:value="form.fileName"
+            v-model:value="formCSV.fileName"
           ></NSelect>
           <NButton @click="addSource('csv')">Add</NButton>
         </NSpace>
@@ -66,21 +68,13 @@ const addSource = (type: string) => {
         <NSpace vertical size="large">
           <NInput placeholder="Name of the source"></NInput>
           <NSelect
-            :options="files"
+            :options="connections"
             placeholder="Select from defined connections"
           >
           </NSelect>
-          <NSpace size="large">
-            <NInput placeholder="Host"></NInput>
-            <NInput placeholder="Port"></NInput>
-            <NInput placeholder="User"></NInput>
-            <NInput placeholder="Password"></NInput>
-            <NInput placeholder="Database"></NInput>
-          </NSpace>
           <NInput placeholder="Table name to extract from"></NInput>
           <NSpace>
-            <NButton>Test Connection</NButton>
-            <NButton :disabled="!isTested">Add</NButton>
+            <NButton>Add</NButton>
           </NSpace>
         </NSpace>
       </NTabPane>

@@ -63,13 +63,13 @@ def test_global_transformations():
         host="localhost", port=5432, user="smidlma", password="", database="warehouse"
     ).save()
     dest = destination.PostgreSQLDest("testDest", "import", connection=connection)
-    sortT = transformation.Sort(name="Sort", position=0, columns=["first_name"])
-    sortT2 = transformation.Sort(name="Sort", position=1, columns=["ip_address"])
-    csv = source.CSV("Mock", "mock.csv")
-    csv2 = source.CSV("CSV", "mock.csv")
+    sortT = transformation.Sort(name="Sort", position=0, columns=["LabUnits"])
+    sortT2 = transformation.Sort(name="Sort", position=0, columns=["PatientLanguage"])
+    csv = source.CSV("Labs", "LabsCorePopulatedTable.txt")
+    csv2 = source.CSV("Pacients", "PatientCorePopulatedTable.txt")
     csv.addTransformation(sortT)
     csv2.addTransformation(sortT2)
-    join = source.Join(name="Join", s1=csv, s2=csv2, on="id", how="left")
+    join = source.Join(name="Join", s1=csv, s2=csv2, on="PatientID", how="left")
     pip.setDestination(dest)
     pip.addJoin(join)
     pip.addSource(csv)
@@ -83,8 +83,8 @@ def test_load_pip_and_run():
     pipeline.run()
 
 
-def test_delimetr():
-    csv = source.CSV(name="asdf", fileName="PatientCorePopulatedTable.txt")
-    csv2 = source.CSV(name="troll", fileName="mock.csv")
-    log.info(csv.defaultSchema)
-    log.info(csv2.defaultSchema)
+# def test_delimetr():
+#     csv = source.CSV(name="asdf", fileName="PatientCorePopulatedTable.txt")
+#     csv2 = source.CSV(name="troll", fileName="mock.csv")
+#     log.info(csv.defaultSchema)
+#     log.info(csv2.defaultSchema)

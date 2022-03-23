@@ -71,7 +71,7 @@ class Source(mongo.EmbeddedDocument):
             "mappedSchema": self.mappedSchema,
             "transformations": [t.json() for t in self.transformations],
             "preview": json.loads(
-                self.dfSample.to_json(
+                self.dfSample.reset_index().to_json(
                     orient="records",
                 )
             ),
@@ -93,16 +93,12 @@ class CSV(Source):
 
     def preview(self) -> pd.DataFrame:
         self.dfSample = pd.read_csv(
-            self.filePath,
-            nrows=5,
-            delimiter=",|;|\t",
-            engine="python",
-            parse_dates=True,
+            self.filePath, nrows=5, sep=",|;|\t", engine="python", index_col=0
         )
         return self.dfSample
 
     def extract(self) -> pd.DataFrame:
-        return pd.read_csv(self.filePath, delimiter=",|;|\t", engine="python")
+        return pd.read_csv(self.filePath, sep=",|;|\t", engine="python", index_col=0)
 
     def json(self):
         res = super().json()

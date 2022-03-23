@@ -84,7 +84,7 @@ const openConfig = (item: string) => {
           Source configuration
         </template>
         <template v-else-if="configItem === 'destination'" #header>
-          Source configuration
+          Destination configuration
         </template>
 
         <div v-if="configItem === 'source'">

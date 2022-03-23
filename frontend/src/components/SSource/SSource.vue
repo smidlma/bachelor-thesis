@@ -16,7 +16,7 @@ const activeDrawer: Ref<boolean> = ref(false)
 <template>
   <div>
     <NSpace vertical :size="30">
-      <NButton @click="activeDrawer = true">Configure</NButton>
+      <!-- <NButton @click="activeDrawer = true">Configure</NButton> -->
       <SSourceMapper
         :default-schema="props.source?.defaultSchema"
         :mapped-schema="props.source?.mappedSchema"

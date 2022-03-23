@@ -9,7 +9,7 @@ import {
 } from 'naive-ui'
 import { PropType, ref } from 'vue'
 import { Connection } from '../types/Pipeline'
-
+import useRest from '../use/rest'
 const props = defineProps({
   connection: {
     type: Object as PropType<Connection>,
@@ -18,6 +18,8 @@ const props = defineProps({
   editable: { type: Boolean, default: false },
 })
 
+const emit = defineEmits(['connectionStatus'])
+const rest = useRest()
 const formRef = ref<FormInst | null>(null)
 const formValue = ref({
   host: props.connection.host,
@@ -60,7 +62,7 @@ const handleValidateClick = (e: MouseEvent) => {
   e.preventDefault()
   formRef.value?.validate((errors) => {
     if (!errors) {
-      testConnection()
+      validateConnection()
     } else {
       console.log(errors)
       // message.error('Invalid')
@@ -68,8 +70,9 @@ const handleValidateClick = (e: MouseEvent) => {
   })
 }
 
-const testConnection = () => {
-  return 'not implemented'
+const validateConnection = async () => {
+  const result = await rest.testConnection(formValue.value)
+  emit('connectionStatus', result)
 }
 </script>
 
@@ -97,7 +100,7 @@ const testConnection = () => {
         v-model:value="formValue.user"
         placeholder="User name"
       /> </NFormItem
-    ><NFormItem label="Password" path="password">
+    ><NFormItem label="Password" path="password" :show-require-mark="false">
       <NInput
         v-model:value="formValue.password"
         placeholder="Password"
