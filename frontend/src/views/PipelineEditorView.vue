@@ -18,6 +18,7 @@ import SSource from '../components/SSource/SSource.vue'
 import SSourceConfig from '../components/SSourceConfig/SSourceConfig.vue'
 import SDestination from '../components/SDestination/SDestination.vue'
 import SDestinationConfig from '../components/SDestinationConfig.vue'
+import SJoin from '../components/SJoin/SJoin.vue'
 
 const store = useStore()
 
@@ -66,9 +67,24 @@ const openConfig = (item: string) => {
     <NDivider></NDivider>
     <NCard title="Joins">
       <template #header-extra>
-        <NButton>Add Join</NButton>
+        <NButton
+          @click="openConfig('join')"
+          :disabled="
+            pipeline.sources.length === 1 ||
+            pipeline.sources.length - 1 === pipeline.joins.length
+          "
+          >Add Join</NButton
+        >
       </template>
-      Joins
+      <NSpace size="large" vertical>
+        <SJoin
+          v-for="(item, index) in pipeline.joins"
+          :key="index"
+          :join="item"
+          :sources="pipeline.sources"
+          :editable="false"
+        />
+      </NSpace>
     </NCard>
     <NDivider></NDivider>
     <NCard title="Destination">
@@ -86,12 +102,22 @@ const openConfig = (item: string) => {
         <template v-else-if="configItem === 'destination'" #header>
           Destination configuration
         </template>
+        <template v-else-if="configItem === 'join'" #header>
+          Join configuration
+        </template>
 
         <div v-if="configItem === 'source'">
           <SSourceConfig />
         </div>
         <div v-else-if="configItem === 'destination'">
           <SDestinationConfig :destination="pipeline.destination" />
+        </div>
+        <div v-else-if="configItem === 'join'">
+          <SJoin
+            :sources="pipeline.sources"
+            :editable="true"
+            @add="activeDrawer = false"
+          />
         </div>
       </NDrawerContent>
     </NDrawer>

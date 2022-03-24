@@ -19,13 +19,27 @@ def main():
         index_col=0,
     )
 
-    join = df.join(df2)
+    df_admisionDiagnoses = pd.read_csv(
+        "file-storage/AdmissionsDiagnosesCorePopulatedTable.txt",
+        sep="\t",
+        engine="python",
+        index_col=0,
+    )
+
+    print(df2.dtypes)
+    print(df_admisionDiagnoses.dtypes)
+    # print(df_admisionDiagnoses.join(df2, on=["AdmissionID", "AdmissionID"]).head())
+
+    print(pd.merge(df_admisionDiagnoses, df2, on="AdmissionID"))
+    # print(df2.join(df_admisionDiagnoses, how="inner", lsuffix="left"))
+
+    # join = df.join(df2)
     # print(build_table_schema(join))
     # print(join.index)
 
-    js = df.reset_index().to_json(orient="records", indent=4)
+    # js = df.reset_index().to_json(orient="records", indent=4)
 
-    print(js)
+    # print(js)
 
     # print(df)
     # print(df2.index)

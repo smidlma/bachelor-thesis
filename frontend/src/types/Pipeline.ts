@@ -61,4 +61,5 @@ export {
   Connection,
   Destination,
   TableRow,
+  Join,
 }

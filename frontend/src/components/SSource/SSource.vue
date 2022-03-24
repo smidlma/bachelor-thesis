@@ -16,9 +16,11 @@ import {
   NCollapse,
   NCollapseItem,
   NIcon,
+  NEmpty,
 } from 'naive-ui'
-import { ArrowDown } from '@vicons/ionicons5'
+import { Add } from '@vicons/ionicons5'
 import SSourceConfig from '../SSourceConfig/SSourceConfig.vue'
+import STransformation from '../STransformation/STransformation.vue'
 
 const props = defineProps({
   source: { type: Object as PropType<Source> },
@@ -67,6 +69,25 @@ const title = h(NH1, { prefix: 'bar' }, { default: () => 'hello' })
               <NText type="primary">Source transformations</NText>
             </NH2>
           </template>
+          <NSpace vertical>
+            <STransformation
+              v-for="(t, index) in props.source?.transformations"
+              :key="index"
+              :transformation="t"
+              :schema="props.source?.mappedSchema"
+            />
+
+            <NEmpty description="Add">
+              <template #icon>
+                <NIcon>
+                  <Add />
+                </NIcon>
+              </template>
+              <template #extra>
+                <NButton size="large"> Select transformation </NButton>
+              </template>
+            </NEmpty>
+          </NSpace>
         </NCollapseItem>
       </NCollapse>
     </NSpace>
