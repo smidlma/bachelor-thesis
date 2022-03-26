@@ -89,12 +89,8 @@ async def get():
 async def get():
     pip = Pipeline.objects()
     if pip is None:
-        return {"Error": "Not found"}
-    # return {"id": pip.id, "name": pip.name, "sources": "s"}
-    # d = {"id": pip.id.__str__()}
-    # print(d)
-
-    return pip.to_json()
+        return []
+    return [p.json() for p in pip]
 
 
 @app.post("/api/pipelines")

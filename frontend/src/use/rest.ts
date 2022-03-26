@@ -1,3 +1,5 @@
+import { Pipeline } from '../types/Pipeline'
+
 export default function () {
   const PORT = 8000
   const API_URL = `http://localhost:${PORT}/api`
@@ -36,8 +38,12 @@ export default function () {
     // return data
   }
 
+  const getPipelines = async (): Promise<Array<Pipeline>> => {
+    return await getAll('pipelines')
+  }
+
   const testConnection = async (body: any): Promise<any> => {
     return await post('connections/test', body)
   }
-  return { getFiles, getConnections, testConnection }
+  return { getFiles, getConnections, testConnection, getPipelines }
 }

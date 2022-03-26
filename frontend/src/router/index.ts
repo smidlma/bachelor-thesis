@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 import PipelineView from '../views/PipelineView.vue'
+
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',

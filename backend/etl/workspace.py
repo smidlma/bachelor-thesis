@@ -52,7 +52,18 @@ class ConnectionManager:
 
 class PipelineBuilder:
     def __init__(self) -> None:
-        self.pipeline = Pipeline.objects(name="My pip").first()
+        self.pipeline = None
+
+    def openPipeline(self, data):
+        self.pipeline = Pipeline.objects(id=data["id"]).first()
+
+    def closePipeline(self, data):
+        self.pipeline = None
+
+    def getPipelineJson(self):
+        if self.pipeline is None:
+            return None
+        return self.pipeline.json()
 
     def schemaMapping(self, data):
         sourceId = data["sourceId"]
@@ -102,10 +113,16 @@ class WorkSpaceManager:
         self.builder = PipelineBuilder()
 
     async def sendOpenedPipeline(self):
-        await self.connectionManager.send(self.builder.pipeline.json())
+        await self.connectionManager.send(self.builder.getPipelineJson())
 
     async def handleMsg(self, msg: dict):
         if msg["cmd"] == Command.INIT_STATE.value:
+            await self.sendOpenedPipeline()
+        elif msg["cmd"] == Command.OPEN_PIPELINE.value:
+            self.builder.openPipeline(msg["data"])
+            await self.sendOpenedPipeline()
+        elif msg["cmd"] == Command.CLOSE_PIPELINE.value:
+            self.builder.closePipeline()
             await self.sendOpenedPipeline()
         elif msg["cmd"] == Command.SOURCE_SCHEMA_MAPPING.value:
             self.builder.schemaMapping(msg["data"])

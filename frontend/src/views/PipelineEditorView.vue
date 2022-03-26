@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, Ref } from 'vue'
+import { computed, onMounted, ref, Ref } from 'vue'
 import { useStore } from 'vuex'
 
 import {
@@ -13,6 +13,7 @@ import {
   NSpace,
   NDrawer,
   NDrawerContent,
+  useMessage,
 } from 'naive-ui'
 import SSource from '../components/SSource/SSource.vue'
 import SSourceConfig from '../components/SSourceConfig/SSourceConfig.vue'
@@ -33,6 +34,9 @@ const openConfig = (item: string) => {
   configItem.value = item
   activeDrawer.value = true
 }
+const message = useMessage()
+
+onMounted(() => message.success('ss'))
 </script>
 
 <template>
