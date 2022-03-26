@@ -16,7 +16,7 @@ class TranformationFactory:
                 ascending=data["ascending"],
             )
         elif data["type"] == "Mask":
-            return MaskColumn(data["column"])
+            return MaskColumn(column=data["column"], position=data["position"])
 
 
 class Command(Enum):
@@ -94,7 +94,6 @@ class PipelineBuilder:
             )
             tr.update(data)
             self.pipeline.save()
-            print("update")
 
 
 class WorkSpaceManager:

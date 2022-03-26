@@ -24,6 +24,8 @@ const store = useStore()
 
 const pipeline = computed(() => store.getters.currentPipeline)
 
+// const sources = computed(() => log)
+
 const activeDrawer: Ref<boolean> = ref(false)
 const configItem: Ref<string> = ref('source')
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { h, PropType, Ref, ref } from 'vue'
+import { h, PropType, Ref, ref, watch } from 'vue'
 import { Source } from '../../types/Pipeline'
 import SSourceMapper from '../SSourceMapper/SSourceMapper.vue'
 import SSourcePreview from '../SSourcePreview/SSourcePreview.vue'
@@ -23,7 +23,7 @@ import SSourceConfig from '../SSourceConfig/SSourceConfig.vue'
 import STransformation from '../STransformation/STransformation.vue'
 
 const props = defineProps({
-  source: { type: Object as PropType<Source>, required: true },
+  source: { type: Object as PropType<Source>, required: false },
 })
 
 const activeDrawer: Ref<boolean> = ref(false)
@@ -75,11 +75,11 @@ const openDrawer = (config: string) => {
           </template>
           <NSpace vertical>
             <STransformation
-              v-for="(t, index) in props.source?.transformations"
+              v-for="(item, index) in props.source?.transformations"
               :key="index"
-              :transformation="t"
+              :transformation="item"
               :schema="props.source?.mappedSchema"
-              :source-id="props.source.id"
+              :source-id="props.source?.id"
             />
             <NEmpty description="Add">
               <template #icon>
@@ -110,7 +110,7 @@ const openDrawer = (config: string) => {
         <SSourceConfig v-if="configItem === 'source'" />
         <STransformation
           v-else-if="configItem === 'transformation'"
-          :source-id="props.source.id"
+          :source-id="props.source?.id"
           :schema="props.source?.mappedSchema"
           :editable="true"
           @close="activeDrawer = false"

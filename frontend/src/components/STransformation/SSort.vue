@@ -1,6 +1,15 @@
 <script setup lang="ts">
-import { NForm, NSelect, NFormItem, FormInst, NButton, NSwitch } from 'naive-ui'
-import { PropType, ref } from 'vue'
+import {
+  NForm,
+  NSelect,
+  NFormItem,
+  FormInst,
+  NButton,
+  NSwitch,
+  NInput,
+  NSpace,
+} from 'naive-ui'
+import { computed, onUpdated, PropType, ref } from 'vue'
 import Field from '../../types/Field'
 
 const props = defineProps({
@@ -11,7 +20,6 @@ const props = defineProps({
 const emit = defineEmits(['save'])
 
 const formRef = ref<FormInst | null>(null)
-
 const formValue = ref({
   column: props.transformation ? props.transformation.column : null,
   ascending: props.transformation ? props.transformation.ascending : true,
@@ -37,31 +45,44 @@ const handleValidateClick = (e: MouseEvent) => {
 }
 </script>
 <template>
-  <NForm
-    ref="formRef"
-    :model="formValue"
-    :rules="rules"
-    :disabled="!props.editable"
-    :show-require-mark="props.editable"
-  >
-    <NFormItem path="column" label="Column">
-      <NSelect
-        :options="
-          props.columns.map((x) => {
-            return { label: x.name, value: x.name }
-          })
-        "
-        v-model:value="formValue.column"
-      ></NSelect>
+  <template v-if="props.editable">
+    <NForm
+      ref="formRef"
+      :model="formValue"
+      :rules="rules"
+      :disabled="!props.editable"
+      :show-require-mark="props.editable"
+    >
+      <NFormItem path="column" label="Column">
+        <NSelect
+          :options="
+            props.columns.map((x) => {
+              return { label: x.name, value: x.name }
+            })
+          "
+          v-model:value="formValue.column"
+        ></NSelect>
+      </NFormItem>
+      <NFormItem label="Order">
+        <NSwitch v-model:value="formValue.ascending">
+          <template #checked> ASC </template>
+          <template #unchecked> DESC </template>
+        </NSwitch>
+      </NFormItem>
+    </NForm>
+    <NButton v-if="props.editable" @click="handleValidateClick"> Save</NButton>
+  </template>
+  <template v-else>
+    <NFormItem label="Column">
+      <NInput :value="props.transformation.column" :disabled="true"></NInput>
     </NFormItem>
     <NFormItem label="Order">
-      <NSwitch v-model:value="formValue.ascending">
+      <NSwitch :value="props.transformation.ascending" :disabled="true">
         <template #checked> ASC </template>
         <template #unchecked> DESC </template>
       </NSwitch>
     </NFormItem>
-  </NForm>
-  <NButton v-if="props.editable" @click="handleValidateClick"> Save</NButton>
+  </template>
 </template>
 
 <style></style>
