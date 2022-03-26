@@ -16,9 +16,15 @@ import {
   NSpace,
   NAvatar,
   MenuOption,
+  NIcon,
 } from 'naive-ui'
-import { ref, h } from 'vue'
+import { ref, h, Component } from 'vue'
 import { RouterLink } from 'vue-router'
+import { Analytics, FileTray, Build } from '@vicons/ionicons5'
+
+const renderIcon = (icon: Component) => {
+  return () => h(NIcon, null, { default: () => h(icon) })
+}
 
 const menuOptions: MenuOption[] = [
   {
@@ -27,13 +33,13 @@ const menuOptions: MenuOption[] = [
         RouterLink,
         {
           to: {
-            name: 'Home',
+            name: 'Pipelines',
           },
         },
-        { default: () => 'Home' }
+        { default: () => 'Pipelines' }
       ),
     key: 'home',
-    // icon: renderIcon(HomeIcon)
+    icon: renderIcon(Analytics),
   },
   {
     label: () =>
@@ -47,7 +53,7 @@ const menuOptions: MenuOption[] = [
         { default: () => 'Files' }
       ),
     key: 'files',
-    // icon: renderIcon(WorkIcon),
+    icon: renderIcon(FileTray),
   },
   {
     label: () =>
@@ -61,7 +67,7 @@ const menuOptions: MenuOption[] = [
         { default: () => 'Editor' }
       ),
     key: 'editor',
-    // icon: renderIcon(WorkIcon),
+    icon: renderIcon(Build),
   },
 ]
 

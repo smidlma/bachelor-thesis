@@ -1,10 +1,10 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import PipelineView from '../views/PipelineView.vue'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    name: 'Home',
-    component: HomeView,
+    name: 'Pipelines',
+    component: PipelineView,
   },
   {
     path: '/files',
