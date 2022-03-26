@@ -1,37 +1,57 @@
 <script setup lang="ts">
-import { NCard, NSelect, NSpace, NInput } from 'naive-ui'
-import { PropType } from 'vue'
+import { NCard, NDivider } from 'naive-ui'
+import { PropType, ref } from 'vue'
 import { Schema } from '../../types/Pipeline'
 import SSort from './SSort.vue'
 import SSelectTransformation from './SSelectTransformation.vue'
-
-const template = [{ name: 'Sort' }]
+import useSocket from '../../use/socket'
+import { ADD_TRANSFORMATION } from '../../utils/commands'
 const props = defineProps({
-  transformation: { type: Object, default: {} },
+  sourceId: { type: String, required: true },
+  transformation: { type: Object, default: null },
   schema: {
     type: Object as PropType<Schema>,
     default: {},
   },
-  select: { type: Boolean, default: false },
   editable: { type: Boolean, default: false },
 })
+const emit = defineEmits(['close'])
+const { sendToServer } = useSocket()
 
-const columns = props.schema?.fields.map((x) => {
-  return { label: x.name, value: x.name }
-})
+const showType = ref(props.transformation ? props.transformation.name : 'Sort')
+const updateType = (value: string) => {
+  showType.value = value
+}
+
+const handleCreateOrUpdate = (data: any) => {
+  let body = null
+  if (props.transformation) {
+    body = { id: props.transformation.id, ...data }
+  } else {
+    body = { id: null, ...data }
+  }
+
+  sendToServer(ADD_TRANSFORMATION, { sourceId: props.sourceId, ...body })
+  emit('close')
+}
 </script>
 
 <template>
-  <div v-if="props.select">
-    <SSelectTransformation />
-  </div>
-  <div v-else>
-    <NCard :title="transformation.name">
-      <div v-if="transformation.name === 'Sort'">
-        <SSort />
-      </div>
-    </NCard>
-  </div>
+  <NCard>
+    <div v-if="!props.transformation">
+      <SSelectTransformation @update-type="updateType" :default="'Sort'" />
+      <NDivider />
+    </div>
+    <div v-if="showType === 'Sort'">
+      <SSort
+        :editable="props.editable"
+        :columns="props.schema?.fields"
+        :transformation="props.transformation"
+        @save="handleCreateOrUpdate"
+      />
+    </div>
+    <div v-else-if="showType === 'Mask'"></div>
+  </NCard>
 </template>
 
 <style></style>

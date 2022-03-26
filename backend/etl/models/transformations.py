@@ -10,7 +10,7 @@ class Transformation(mongo.EmbeddedDocument):
     name = mongo.StringField()
     position = mongo.IntField()
 
-    meta = {'allow_inheritance': True}
+    meta = {"allow_inheritance": True}
 
     def __init__(self, *args, **values):
         super().__init__(*args, **values)
@@ -18,74 +18,54 @@ class Transformation(mongo.EmbeddedDocument):
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         pass
 
+    def update(self, data):
+        pass
+
     def json(self):
         return {"id": str(self.id), "name": self.name, "position": self.position}
 
 
 class Sort(Transformation):
-    columns = mongo.ListField(mongo.StringField())
+    column = mongo.StringField()
     ascending = mongo.BooleanField(default=True)
 
     def __init__(self, *args, **values):
+        if "name" not in values:
+            values["name"] = "Sort"
         super().__init__(*args, **values)
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        log.info(f'RUNNING SORT:,{self.columns}, {self.ascending}')
-        return df.sort_values(by=self.columns, ascending=self.ascending)
+        log.info(f"RUNNING SORT:,{self.column}, {self.ascending}")
+        return df.sort_values(by=self.column, ascending=self.ascending)
+
+    def update(self, data):
+        self.column = data["column"]
+        self.ascending = data["ascending"]
 
     def json(self):
-        res =  super().json()
-        res["columns"] = self.columns
+        res = super().json()
+        res["column"] = self.column
         res["ascending"] = self.ascending
         return res
 
 
-# Mask single or multiple cols with ####
+# Mask single column
 class MaskColumn(Transformation):
-    columns = mongo.ListField(mongo.StringField())
+    column = mongo.StringField()
 
     def __init__(self, *args, **values):
+        if "name" not in values:
+            values["name"] = "Mask"
         super().__init__(*args, **values)
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        df[self.columns] = "####"
+        df[self.column] = "####"
         return df
 
+    def update(self, data):
+        self.column = data["column"]
+
     def json(self):
-        res =  super().json()
-        res["columns"] = self.columns
+        res = super().json()
+        res["column"] = self.column
         return res
-
-
-# Drop single or multiple cols
-class DropColumn(Transformation):
-    columns = mongo.ListField(mongo.StringField())
-
-    def __init__(self, *args, **values):
-        super().__init__(*args, **values)
-
-    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        return df.drop(columns=self.columns)
-
-class Validate(Transformation):
-    def __init__(self, *args, **values):
-        super().__init__(*args, **values)
-
-    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        return super().transform(df)
-
-
-class Filter(Transformation):
-    columns = mongo.DictField()
-
-    def __init__(self, *args, **values):
-        super().__init__(*args, **values)
-
-    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        for key, value in self.columns:
-            df = df[df[key]]
-
-
-
-class RemoveDuplicates(Transformation):
-    pass

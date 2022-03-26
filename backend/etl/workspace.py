@@ -3,6 +3,20 @@ from typing import List
 from fastapi import WebSocket
 from etl.models.pipeline import Pipeline
 from etl.models.sources import CSV, Join
+from etl.models.transformations import MaskColumn, Sort
+
+
+class TranformationFactory:
+    @staticmethod
+    def createTransformation(data):
+        if data["type"] == "Sort":
+            return Sort(
+                column=data["column"],
+                position=data["position"],
+                ascending=data["ascending"],
+            )
+        elif data["type"] == "Mask":
+            return MaskColumn(data["column"])
 
 
 class Command(Enum):
@@ -46,7 +60,6 @@ class PipelineBuilder:
         schema = data["schema"]
         s.setSchema(schema)
         self.pipeline.save()
-        pass
 
     def addSource(self, data):
         if data["sourceType"] == "csv":
@@ -63,6 +76,25 @@ class PipelineBuilder:
         join = Join(s1=s1, s2=s2, how=how)
         self.pipeline.addJoin(join)
         self.pipeline.save()
+
+    def addTransformation(self, data):
+        s = next(
+            filter(lambda x: str(x.id) == data["sourceId"], self.pipeline.sources), None
+        )
+        if data["id"] is None:
+            pos = len(s.transformations) - 1
+            data["position"] = pos
+            tr = TranformationFactory.createTransformation(data)
+            s.addTransformation(tr)
+            self.pipeline.save()
+        else:
+            tr = next(
+                filter(lambda x: str(x.id) == data["id"], s.transformations),
+                None,
+            )
+            tr.update(data)
+            self.pipeline.save()
+            print("update")
 
 
 class WorkSpaceManager:
@@ -84,4 +116,7 @@ class WorkSpaceManager:
             await self.sendOpenedPipeline()
         elif msg["cmd"] == Command.ADD_JOIN.value:
             self.builder.addJoin(msg["data"])
+            await self.sendOpenedPipeline()
+        elif msg["cmd"] == Command.ADD_TRANSFORMATION.value:
+            self.builder.addTransformation(msg["data"])
             await self.sendOpenedPipeline()

@@ -23,12 +23,16 @@ import SSourceConfig from '../SSourceConfig/SSourceConfig.vue'
 import STransformation from '../STransformation/STransformation.vue'
 
 const props = defineProps({
-  source: { type: Object as PropType<Source> },
+  source: { type: Object as PropType<Source>, required: true },
 })
 
 const activeDrawer: Ref<boolean> = ref(false)
+const configItem = ref('')
 
-const title = h(NH1, { prefix: 'bar' }, { default: () => 'hello' })
+const openDrawer = (config: string) => {
+  configItem.value = config
+  activeDrawer.value = true
+}
 </script>
 
 <template>
@@ -37,7 +41,7 @@ const title = h(NH1, { prefix: 'bar' }, { default: () => 'hello' })
       <!-- <NButton @click="activeDrawer = true">Configure</NButton> -->
       <NCollapse
         arrow-placement="right"
-        :default-expanded-names="['mapper', 'preview']"
+        :default-expanded-names="['mapper', 'preview', 'transformations']"
       >
         <template #arrow> </template>
         <NCollapseItem name="mapper">
@@ -75,8 +79,8 @@ const title = h(NH1, { prefix: 'bar' }, { default: () => 'hello' })
               :key="index"
               :transformation="t"
               :schema="props.source?.mappedSchema"
+              :source-id="props.source.id"
             />
-
             <NEmpty description="Add">
               <template #icon>
                 <NIcon>
@@ -84,7 +88,9 @@ const title = h(NH1, { prefix: 'bar' }, { default: () => 'hello' })
                 </NIcon>
               </template>
               <template #extra>
-                <NButton size="large"> Select transformation </NButton>
+                <NButton size="large" @click="openDrawer('transformation')">
+                  Select transformation
+                </NButton>
               </template>
             </NEmpty>
           </NSpace>
@@ -94,8 +100,21 @@ const title = h(NH1, { prefix: 'bar' }, { default: () => 'hello' })
     <!-- Drawer -->
     <NDrawer placement="right" :width="612" v-model:show="activeDrawer">
       <NDrawerContent>
-        <template #header> Source configuration </template>
-        <SSourceConfig />
+        <template v-if="configItem === 'source'" #header>
+          Source configuration
+        </template>
+        <template v-else-if="configItem === 'transformation'" #header>
+          Transformation configuration
+        </template>
+
+        <SSourceConfig v-if="configItem === 'source'" />
+        <STransformation
+          v-else-if="configItem === 'transformation'"
+          :source-id="props.source.id"
+          :schema="props.source?.mappedSchema"
+          :editable="true"
+          @close="activeDrawer = false"
+        />
       </NDrawerContent>
     </NDrawer>
     <!-- End of Drawer -->

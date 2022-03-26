@@ -48,8 +48,8 @@ def test_load_run_pipeline():
 
 
 def test_local_transformation():
-    sortT = transformation.Sort(name="Sort", position=0, columns=["first_name"])
-    sortT2 = transformation.Sort(name="Sort", position=1, columns=["ip_address"])
+    sortT = transformation.Sort(position=0, column="first_name")
+    sortT2 = transformation.Sort(position=0, column="ip_address")
     csv = source.CSV("csv", "mock.csv")
     csv.addTransformation(sortT)
     csv.addTransformation(sortT2)
@@ -63,8 +63,8 @@ def test_global_transformations():
         host="localhost", port=5432, user="smidlma", password="", database="warehouse"
     ).save()
     dest = destination.PostgreSQLDest("testDest", "import", connection=connection)
-    sortT = transformation.Sort(name="Sort", position=0, columns=["LabUnits"])
-    sortT2 = transformation.Sort(name="Sort", position=0, columns=["PatientLanguage"])
+    sortT = transformation.Sort(position=0, column="LabUnits")
+    sortT2 = transformation.Sort(position=1, column="PatientLanguage")
     csv = source.CSV("Labs", "LabsCorePopulatedTable.txt")
     csv2 = source.CSV("Pacients", "PatientCorePopulatedTable.txt")
     csv.addTransformation(sortT)
