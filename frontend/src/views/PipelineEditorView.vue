@@ -13,6 +13,7 @@ import {
   NSpace,
   NDrawer,
   NDrawerContent,
+  NEmpty,
   useMessage,
 } from 'naive-ui'
 import SSource from '../components/SSource/SSource.vue'
@@ -20,6 +21,10 @@ import SSourceConfig from '../components/SSourceConfig/SSourceConfig.vue'
 import SDestination from '../components/SDestination/SDestination.vue'
 import SDestinationConfig from '../components/SDestinationConfig.vue'
 import SJoin from '../components/SJoin/SJoin.vue'
+import SPipeline from '../components/SPipeline/SPipeline.vue'
+import useSocket from '../use/socket'
+import { CLOSE_PIPELINE, RUN_PIPELINE } from '../utils/commands'
+import { useRouter } from 'vue-router'
 
 const store = useStore()
 
@@ -37,23 +42,30 @@ const openConfig = (item: string) => {
 const message = useMessage()
 
 onMounted(() => message.success('mounted'))
+const socket = useSocket()
+const closePipeline = (id: string) => {
+  socket.sendToServer(CLOSE_PIPELINE, { id })
+}
+
+const runPipeline = () => {
+  socket.sendToServer(RUN_PIPELINE, {})
+}
+
+const router = useRouter()
+const goToPipelines = () => {
+  router.push({ name: 'Pipelines' })
+}
 </script>
 
 <template>
   <template v-if="pipeline">
-    <NPageHeader :subtitle="`Uploaded files:`">
-      <template #title>Pipeline: </template>
-      <template #avatar>
-        <NAvatar
-          src="https://cdnimg103.lizhi.fm/user/2017/02/04/2583325032200238082_160x160.jpg"
-        />
-      </template>
-      <template #extra>
-        <NSpace>
-          <NButton>Hello World</NButton>
-        </NSpace>
-      </template>
-    </NPageHeader>
+    <SPipeline
+      :pipeline="pipeline"
+      :card="true"
+      :editor="true"
+      @close="closePipeline"
+      @run="runPipeline"
+    />
     <NDivider></NDivider>
     <NCard title="Sources">
       <template #header-extra>
@@ -129,7 +141,13 @@ onMounted(() => message.success('mounted'))
     </NDrawer>
     <!-- End of Drawer -->
   </template>
-  <template v-else> No pipeline opened </template>
+  <template v-else>
+    <NEmpty description="All pipelines are closed" style="padding-top: 48px">
+      <template #extra>
+        <NButton size="medium" @click="goToPipelines"> Show Pipelines </NButton>
+      </template>
+    </NEmpty>
+  </template>
 </template>
 
 <style></style>

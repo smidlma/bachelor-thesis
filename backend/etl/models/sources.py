@@ -53,8 +53,18 @@ class Source(mongo.EmbeddedDocument):
         dfTemp = self.extract()
         for tr in self.transformations:
             dfTemp = tr.transform(dfTemp)
-            log.info(dfTemp)
-        self.transformedData = dfTemp
+        # self.transformedData = dfTemp
+        return dfTemp
+
+    def runTestTransformation(self, to=-1):
+        dfTemp = self.preview()
+
+        if to == -1:
+            to = len(self.transformations)
+
+        for idx in range(to):
+            dfTemp = self.transformations[idx].transform(dfTemp)
+        # self.transformedData = dfTemp
         return dfTemp
 
     def setSchema(self, mappedSchema):

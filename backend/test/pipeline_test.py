@@ -64,7 +64,7 @@ def test_global_transformations():
     ).save()
     dest = destination.PostgreSQLDest("testDest", "import", connection=connection)
     sortT = transformation.Sort(position=0, column="LabUnits")
-    sortT2 = transformation.Sort(position=1, column="PatientLanguage")
+    sortT2 = transformation.Sort(position=0, column="PatientLanguage")
     csv = source.CSV("Labs", "LabsCorePopulatedTable.txt")
     csv2 = source.CSV("Pacients", "PatientCorePopulatedTable.txt")
     csv.addTransformation(sortT)

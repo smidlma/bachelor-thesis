@@ -1,12 +1,11 @@
+import { getCurrentInstance } from 'vue'
 import { createStore } from 'vuex'
-
+import { INIT_STATE } from '../utils/commands'
 export default createStore({
   state: {
     socket: {
       // Connection Status
       isConnected: false,
-      // Message content
-      message: '',
       // Reconnect error
       reconnectError: false,
       // Heartbeat message sending time
@@ -15,12 +14,18 @@ export default createStore({
       heartBeatTimer: 0,
     },
     pipeline: null,
+    runningPipelines: [],
+    issues: [],
   },
   mutations: {
     // Connection open
     SOCKET_ONOPEN(state, event) {
       state.socket.isConnected = true
       console.log('Connection open')
+      const socket = event.currentTarget
+      const msg = { from: 'FE', to: 'BE', cmd: INIT_STATE, data: null }
+      console.log(msg)
+      socket.sendObj(msg)
     },
     // Connection closed
     SOCKET_ONCLOSE(state, event) {
@@ -35,7 +40,11 @@ export default createStore({
     // Receive the message sent by the server
     SOCKET_ONMESSAGE(state, message) {
       console.log(message)
-      state.pipeline = message.data
+      if (message.cmd === 'PIPELINE') {
+        state.pipeline = message.data
+      } else if (message.cmd === 'INIT') {
+      } else if (message.cmd === 'RUNNING_PIPELINE') {
+      }
     },
     // Auto reconnect
     SOCKET_RECONNECT(state, count) {

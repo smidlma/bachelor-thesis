@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { Pipeline } from '../types/Pipeline'
 import useRest from '../use/rest'
 import SPipeline from '../components/SPipeline/SPipeline.vue'
@@ -42,6 +42,7 @@ onMounted(async () => {
         :pipeline="item"
         :is-opened="item.id === openedId"
         @open="openPipeline"
+        :card="true"
       />
     </div>
   </NSpace>

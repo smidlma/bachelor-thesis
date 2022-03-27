@@ -45,8 +45,8 @@ class ConnectionManager:
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
 
-    async def send(self, data: dict):
-        resp = {"from": "BE", "to": "FE", "data": data}
+    async def send(self, cmd, data: dict):
+        resp = {"from": "BE", "to": "FE", "cmd": cmd, "data": data}
         for connection in self.active_connections:
             await connection.send_json(resp)
 
@@ -117,24 +117,33 @@ class WorkSpaceManager:
     def __init__(self) -> None:
         self.connectionManager = ConnectionManager()
         self.builder = PipelineBuilder()
+        self.running = []
+
+    async def sendInitState(self):
+        await self.sendOpenedPipeline()
+        await self.sendRunning()
+
+    async def sendRunning(self):
+        await self.connectionManager.send("RUNNING_PIPELINE", self.running)
 
     async def sendOpenedPipeline(self):
-        await self.connectionManager.send(self.builder.getPipelineJson())
+        await self.connectionManager.send("PIPELINE", self.builder.getPipelineJson())
 
     async def runPipeline(self, pipeline: Pipeline):
         print("task start")
-        await asyncio.sleep(10)
+        # await asyncio.sleep(10)
+        await pipeline.run()
         print("task end")
         return True
 
     async def handleMsg(self, msg: dict):
         if msg["cmd"] == Command.INIT_STATE.value:
-            await self.sendOpenedPipeline()
+            await self.sendInitState()
         elif msg["cmd"] == Command.OPEN_PIPELINE.value:
             self.builder.openPipeline(msg["data"])
             await self.sendOpenedPipeline()
         elif msg["cmd"] == Command.CLOSE_PIPELINE.value:
-            self.builder.closePipeline()
+            self.builder.closePipeline(msg["data"])
             await self.sendOpenedPipeline()
         elif msg["cmd"] == Command.RUN_PIPELINE.value:
             res = await self.runPipeline(self.builder.pipeline)

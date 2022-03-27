@@ -6,8 +6,8 @@ import {
   NText,
   NH5,
   NIcon,
-  NGrid,
-  NGi,
+  NPageHeader,
+  NAvatar,
   NButton,
 } from 'naive-ui'
 import { PropType } from 'vue'
@@ -16,33 +16,34 @@ import { ChevronForward } from '@vicons/ionicons5'
 const props = defineProps({
   pipeline: { type: Object as PropType<Pipeline>, required: true },
   isOpened: { type: Boolean, default: false },
+  card: { type: Boolean, default: false },
+  editor: { type: Boolean, default: false },
 })
 
-const emit = defineEmits(['open', 'close'])
+const emit = defineEmits(['open', 'close', 'run'])
 </script>
 
 <template>
-  <NCard>
-    <NGrid cols="4" responsive="screen">
-      <NGi>
-        <NSpace vertical>
-          <NH2 prefix="bar">
-            <NText>{{ props.pipeline.name }}</NText>
-          </NH2>
+  <NCard v-if="props.card">
+    <NPageHeader :subtitle="`Sources: ${props.pipeline.sources.length}`">
+      <template #title>Pipeline: {{ props.pipeline.name }}</template>
+      <template #avatar>
+        <NAvatar
+          src="https://cdnimg103.lizhi.fm/user/2017/02/04/2583325032200238082_160x160.jpg"
+        />
+      </template>
+      <template #extra>
+        <NSpace>
+          <NButton v-if="!props.editor" @click="emit('open', props.pipeline.id)"
+            >Open</NButton
+          >
+          <NSpace v-else>
+            <NButton @click="emit('run', props.pipeline.id)">Run</NButton>
+            <NButton @click="emit('close', props.pipeline.id)">Close</NButton>
+          </NSpace>
         </NSpace>
-      </NGi>
-      <NGi style="text-align: center">
-        <NIcon size="80"><ChevronForward /></NIcon>
-      </NGi>
-      <NGi style="text-align: center">
-        <NH2>
-          <NText>{{ props.pipeline.destination.destinationName }} </NText>
-        </NH2>
-      </NGi>
-      <NGi>
-        <NButton @click="emit('open', props.pipeline.id)">Open</NButton>
-      </NGi>
-    </NGrid>
+      </template>
+    </NPageHeader>
   </NCard>
 </template>
 <style></style>

@@ -1,3 +1,4 @@
+import asyncio
 from time import sleep
 import etl.models.transformations as tr
 import etl.models.sources as source
@@ -59,7 +60,7 @@ class Pipeline(mongo.Document):
 
                 log.info(transformedSource[join.id])
             print("going to sleep")
-            sleep(20)
+            await asyncio.sleep(10)
             return {"success": True}
         except Exception as e:
             return {"success": False, "error": str(e)}

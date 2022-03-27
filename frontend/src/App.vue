@@ -9,7 +9,6 @@ import {
   NLoadingBarProvider,
 } from 'naive-ui'
 import { ref } from 'vue'
-
 import Layout from './Layout.vue'
 
 const theme = ref<GlobalTheme | null>(darkTheme)
