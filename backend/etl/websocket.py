@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from etl.workspace import WorkSpaceManager
 import logging as log
@@ -9,14 +11,15 @@ router = APIRouter()
 manager = WorkSpaceManager()
 
 
-@router.websocket("/ws", format)
+@router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket, client_id=0):
     await manager.connectionManager.connect(websocket)
     try:
         while True:
             msg = await websocket.receive_json()
             log.info(msg)
-            await manager.handleMsg(msg)
+            # await manager.handleMsg(msg)
+            asyncio.create_task(manager.handleMsg(msg))
+
     except WebSocketDisconnect:
         manager.connectionManager.disconnect(websocket)
-        # await manager.broadcast(f"Client #{client_id} left the chat")

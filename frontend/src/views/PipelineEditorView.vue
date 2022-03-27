@@ -36,7 +36,7 @@ const openConfig = (item: string) => {
 }
 const message = useMessage()
 
-onMounted(() => message.success('ss'))
+onMounted(() => message.success('mounted'))
 </script>
 
 <template>

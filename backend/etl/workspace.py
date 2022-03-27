@@ -1,3 +1,4 @@
+import asyncio
 from enum import Enum
 from typing import List
 from fastapi import WebSocket
@@ -107,6 +108,11 @@ class PipelineBuilder:
             self.pipeline.save()
 
 
+class Cluster:
+    def __init__(self) -> None:
+        pass
+
+
 class WorkSpaceManager:
     def __init__(self) -> None:
         self.connectionManager = ConnectionManager()
@@ -114,6 +120,12 @@ class WorkSpaceManager:
 
     async def sendOpenedPipeline(self):
         await self.connectionManager.send(self.builder.getPipelineJson())
+
+    async def runPipeline(self, pipeline: Pipeline):
+        print("task start")
+        await asyncio.sleep(10)
+        print("task end")
+        return True
 
     async def handleMsg(self, msg: dict):
         if msg["cmd"] == Command.INIT_STATE.value:
@@ -124,6 +136,9 @@ class WorkSpaceManager:
         elif msg["cmd"] == Command.CLOSE_PIPELINE.value:
             self.builder.closePipeline()
             await self.sendOpenedPipeline()
+        elif msg["cmd"] == Command.RUN_PIPELINE.value:
+            res = await self.runPipeline(self.builder.pipeline)
+            print(res)
         elif msg["cmd"] == Command.SOURCE_SCHEMA_MAPPING.value:
             self.builder.schemaMapping(msg["data"])
             await self.sendOpenedPipeline()

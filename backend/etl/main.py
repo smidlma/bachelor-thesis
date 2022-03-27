@@ -1,3 +1,4 @@
+from asyncio import sleep
 import os
 from typing import Optional
 from fastapi import FastAPI, Request, UploadFile, WebSocket
@@ -101,6 +102,7 @@ async def createPipeline():
 ########## Manage connections ##########
 @app.get("/api/connections")
 async def getConnections():
+    await sleep(10)
     connections = Connection.objects()
     return [c.json() for c in connections]
 

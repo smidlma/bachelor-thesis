@@ -1,3 +1,4 @@
+from time import sleep
 import etl.models.transformations as tr
 import etl.models.sources as source
 import etl.models.destinations as dest
@@ -41,21 +42,27 @@ class Pipeline(mongo.Document):
         log.debug(f"Rows affected: {affected}")
         return affected
 
-    def run(self):
-        transformedSource = dict()
-        # Run local trans of sources and save to dict
-        for source in self.sources:
-            transformedSource[source.id] = source.runTransformations()
-            # log.info(source.id)
+    async def run(self):
+        try:
+            transformedSource = dict()
+            # Run local trans of sources and save to dict
+            for source in self.sources:
+                transformedSource[source.id] = source.runTransformations()
+                # log.info(source.id)
 
-        # log.info(transformedSource)
+            # log.info(transformedSource)
 
-        for join in self.joins:
-            transformedSource[join.id] = join.join(
-                transformedSource.get(join.s1.id), transformedSource.get(join.s2.id)
-            )
+            for join in self.joins:
+                transformedSource[join.id] = join.join(
+                    transformedSource.get(join.s1.id), transformedSource.get(join.s2.id)
+                )
 
-            log.info(transformedSource[join.id])
+                log.info(transformedSource[join.id])
+            print("going to sleep")
+            sleep(20)
+            return {"success": True}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
 
     def moveToDestination(self):
         pass

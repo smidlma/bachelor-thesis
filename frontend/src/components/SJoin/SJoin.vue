@@ -34,17 +34,17 @@ const rules = {
   s1: {
     required: true,
     trigger: ['blur', 'change'],
-    message: 'Please select selectValue',
+    message: 'Please select source',
   },
   s2: {
     required: true,
     trigger: ['blur', 'change'],
-    message: 'Please select selectValue',
+    message: 'Please select source',
   },
   how: {
     required: true,
     trigger: ['blur', 'change'],
-    message: 'Please select selectValue',
+    message: 'Please select type of join',
   },
 }
 

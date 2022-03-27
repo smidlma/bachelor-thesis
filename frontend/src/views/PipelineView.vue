@@ -31,12 +31,6 @@ const openPipeline = (id: string) => {
 const message = useMessage()
 onMounted(async () => {
   pipelines.value = await rest.getPipelines()
-  console.log(pipelines.value)
-  message.info('mounted')
-})
-
-onUnmounted(() => {
-  message.error('unmounted')
 })
 </script>
 
