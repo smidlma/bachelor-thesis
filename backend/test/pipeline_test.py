@@ -83,8 +83,5 @@ def test_load_pip_and_run():
     pipeline.run()
 
 
-# def test_delimetr():
-#     csv = source.CSV(name="asdf", fileName="PatientCorePopulatedTable.txt")
-#     csv2 = source.CSV(name="troll", fileName="mock.csv")
-#     log.info(csv.defaultSchema)
-#     log.info(csv2.defaultSchema)
+# def load_from_schema():
+#     mockDf = pd.read_csv('file-storage/mock.csv')

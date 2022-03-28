@@ -130,8 +130,11 @@ class WorkSpaceManager:
         await self.connectionManager.send("PIPELINE", self.builder.getPipelineJson())
 
     async def runPipeline(self, pipeline: Pipeline):
+        if pipeline is None:
+            return False
         print("task start")
         # await asyncio.sleep(10)
+        print(pipeline)
         await pipeline.run()
         print("task end")
         return True

@@ -11,6 +11,21 @@ import logging as log
 from bson import ObjectId
 
 
+def convertToPandasTypes(type: str):
+    if type == "integer":
+        return "int64"
+    elif type == "number":
+        return "float64"
+    elif type == "boolean":
+        return "bool"
+    elif type == "any":
+        return "categorical"
+    elif type == "string":
+        return "object"
+    elif type == "datetime":
+        return "datetime64[ns]"
+
+
 # Source base class with general functionality
 class Source(mongo.EmbeddedDocument):
     id = mongo.ObjectIdField(default=ObjectId)
@@ -23,8 +38,6 @@ class Source(mongo.EmbeddedDocument):
 
     def __init__(self, **data) -> None:
         super(Source, self).__init__(**data)
-
-        # print("Base constructor")
         self.transformedData = None
         self._dfSample = self.preview()
         self.defaultSchema = build_table_schema(self.dfSample)
@@ -40,7 +53,7 @@ class Source(mongo.EmbeddedDocument):
     def testConnection(self) -> bool:
         pass
 
-    def preview(self) -> pd.DataFrame:
+    def preview(self, nrows=5, mapped=False) -> pd.DataFrame:
         pass
 
     def extract(self) -> pd.DataFrame:
@@ -71,9 +84,6 @@ class Source(mongo.EmbeddedDocument):
         self.mappedSchema = mappedSchema
 
     def json(self):
-        # print(self.dfSample.to_dict(orient="records"))
-        # print("########")
-        # print(self.dfSample)
         return {
             "id": str(self.id),
             "name": self.name,
@@ -92,6 +102,7 @@ class Source(mongo.EmbeddedDocument):
 class CSV(Source):
     fileName = mongo.StringField()
     filePath = mongo.StringField()
+    separator = mongo.StringField(default=",|;|\t")
 
     def __init__(self, name: str, fileName: str, **data) -> None:
         if "filePath" not in data:
@@ -101,14 +112,42 @@ class CSV(Source):
     def testConnection(self) -> bool:
         return exists(self.filePath)
 
-    def preview(self) -> pd.DataFrame:
-        self.dfSample = pd.read_csv(
-            self.filePath, nrows=5, sep=",|;|\t", engine="python", index_col=0
-        )
+    def preview(self, nrows=5, mapped=False) -> pd.DataFrame:
+        if mapped:
+            fields = self.mappedSchema["fields"]
+            cols = list(map(lambda x: x["name"], fields))
+            types = {f["name"]: convertToPandasTypes(f["type"]) for f in fields}
+            self.dfSample = pd.read_csv(
+                self.filePath,
+                nrows=nrows,
+                sep=self.separator,
+                engine="python",
+                index_col=0,
+                dtype=types,
+                usecols=cols,
+            )
+        else:
+            self.dfSample = pd.read_csv(
+                self.filePath,
+                nrows=nrows,
+                sep=self.separator,
+                engine="python",
+                index_col=0,
+            )
         return self.dfSample
 
     def extract(self) -> pd.DataFrame:
-        return pd.read_csv(self.filePath, sep=",|;|\t", engine="python", index_col=0)
+        fields = self.mappedSchema["fields"]
+        cols = list(map(lambda x: x["name"], fields))
+        types = {f["name"]: convertToPandasTypes(f["type"]) for f in fields}
+        self.dfSample = pd.read_csv(
+            self.filePath,
+            sep=self.separator,
+            engine="python",
+            index_col=0,
+            dtype=types,
+            usecols=cols,
+        )
 
     def json(self):
         res = super().json()
@@ -133,7 +172,7 @@ class PostgreSQL(Source):
     def testConnection(self) -> bool:
         return self.connection.isConnected()
 
-    def preview(self) -> pd.DataFrame:
+    def preview(self, nrows=5, mapped=False) -> pd.DataFrame:
         if not self.testConnection():
             self.connection.connect()
 
