@@ -1,40 +1,25 @@
-from typing import List
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+import asyncio
 
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from etl.workspace import WorkSpaceManager
+import logging as log
+import mongoengine as mongo
+
+mongo.connect("mongotest")
 
 router = APIRouter()
-
-class ConnectionManager:
-    def __init__(self):
-        self.active_connections: List[WebSocket] = []
-
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections.append(websocket)
-
-    def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
-
-    async def send_personal_message(self, message: str, websocket: WebSocket):
-        await websocket.send_text(message)
-
-    async def broadcast(self, message: str):
-        for connection in self.active_connections:
-            await connection.send_text(message)
-
-
-manager = ConnectionManager()
-
+manager = WorkSpaceManager()
 
 
 @router.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket, client_id = 0):
-    await manager.connect(websocket)
+async def websocket_endpoint(websocket: WebSocket, client_id=0):
+    await manager.connectionManager.connect(websocket)
     try:
         while True:
-            data = await websocket.receive_text()
-            await manager.send_personal_message(f"You wrote: {data}", websocket)
-            await manager.broadcast(f"Client #{client_id} says: {data}")
+            msg = await websocket.receive_json()
+            log.info(msg)
+            # await manager.handleMsg(msg)
+            asyncio.create_task(manager.handleMsg(msg))
+
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
-        await manager.broadcast(f"Client #{client_id} left the chat")
+        manager.connectionManager.disconnect(websocket)

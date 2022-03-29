@@ -1,4 +1,7 @@
+import asyncio
+from time import sleep
 
+from pandas import DataFrame
 import etl.models.transformations as tr
 import etl.models.sources as source
 import etl.models.destinations as dest
@@ -10,13 +13,21 @@ import mongoengine as mongo
 
 class Pipeline(mongo.Document):
     name = mongo.StringField()
-    sources = mongo.ListField(mongo.ReferenceField(source.Source))
-    destination = mongo.ReferenceField(dest.Destination)
-    joins = mongo.ListField(mongo.ReferenceField(source.Join))
+    sources = mongo.EmbeddedDocumentListField(source.Source)
+    destination = mongo.EmbeddedDocumentField(dest.Destination)
+    joins = mongo.EmbeddedDocumentListField(source.Join)
 
-    def __init__(self, name, sources: list[source.Source] = [], joins: list[source.Join] = [], destination=None, **data) -> None:
-        super(Pipeline, self).__init__(name=name, sources=sources,
-                                       joins=joins, destination=destination, **data)
+    def __init__(
+        self,
+        name,
+        sources: list[source.Source] = [],
+        joins: list[source.Join] = [],
+        destination=None,
+        **data,
+    ) -> None:
+        super(Pipeline, self).__init__(
+            name=name, sources=sources, joins=joins, destination=destination, **data
+        )
 
     def addSource(self, source: source.Source):
         self.sources.append(source)
@@ -28,26 +39,44 @@ class Pipeline(mongo.Document):
         self.destination = destination
 
     def runTest(self):
-        log.debug(f'Running pipeline: {self.name}')
-        df = self.sources[0].extract()
-        affected = self.destination.load(df, dest.InsertOption.REPLACE)
-        log.debug(f'Rows affected: {affected}')
+        log.debug(f"Running pipeline: {self.name}")
+        df = self.sources[0].runTransformations()
+        affected = self.destination.load(df)
+        log.debug(f"Rows affected: {affected}")
         return affected
 
     def run(self):
-        transformedSource = dict()
-        # Run local trans of sources and save to dict
-        for source in self.sources:
-            transformedSource[source.id] = source.runTransformations()
-            # log.info(source.id)
+        try:
+            transformedSource = dict()
+            # Run local trans of sources and save to dict
+            lastTransformedId = None
+            for source in self.sources:
+                lastTransformedId = source.id
+                transformedSource[source.id] = source.runTransformations()
 
-        # log.info(transformedSource)
+            # Run joins of sources
+            for join in self.joins:
+                lastTransformedId = join.id
+                transformedSource[join.id] = join.join(
+                    transformedSource.get(join.s1.id), transformedSource.get(join.s2.id)
+                )
+                log.info(transformedSource[join.id])
 
-        for join in self.joins:
-            transformedSource[join.id] = join.join(transformedSource.get(
-                join.s1.id), transformedSource.get(join.s2.id))
+            # Call destination to load df to db
+            rowsAffected = self.moveToDestination(transformedSource[lastTransformedId])
 
-            log.info(transformedSource[join.id])
+            return {"success": True, "rowsAffected": rowsAffected}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
 
-    def moveToDestination(self):
-        pass
+    def moveToDestination(self, df: DataFrame):
+        return self.destination.load(df)
+
+    def json(self):
+        return {
+            "id": str(self.id),
+            "name": self.name,
+            "sources": [s.json() for s in self.sources],
+            "destination": self.destination.json() if self.destination else None,
+            "joins": [j.json() for j in self.joins],
+        }
