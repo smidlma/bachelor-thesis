@@ -13,7 +13,7 @@ def convertToPandasTypes(type: str):
     elif type == "boolean":
         return "bool"
     elif type == "any":
-        return "categorical"
+        return "category"
     elif type == "string":
         return "object"
     elif type == "datetime":
@@ -39,7 +39,7 @@ def main():
     mapped = {
         "fields": [
             {"name": "PatientID", "type": "string"},
-            {"name": "PatientGender", "type": "string"},
+            {"name": "PatientGender", "type": "any"},
             {"name": "PatientDateOfBirth", "type": "datetime"},
             # {"name": "PatientRace", "type": "string"},
             {"name": "PatientMaritalStatus", "type": "string"},
@@ -65,6 +65,7 @@ def main():
         usecols=cols,
     )
     print(dfTest.dtypes)
+
     # print(fields)
     # print(cols)
     # df2 = pd.read_csv(

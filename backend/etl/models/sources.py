@@ -38,7 +38,6 @@ class Source(mongo.EmbeddedDocument):
 
     def __init__(self, **data) -> None:
         super(Source, self).__init__(**data)
-        self.transformedData = None
         self._dfSample = self.preview()
         self.defaultSchema = build_table_schema(self.dfSample)
 
@@ -66,7 +65,7 @@ class Source(mongo.EmbeddedDocument):
         dfTemp = self.extract()
         for tr in self.transformations:
             dfTemp = tr.transform(dfTemp)
-        # self.transformedData = dfTemp
+
         return dfTemp
 
     def runTestTransformation(self, to=-1):
@@ -77,7 +76,7 @@ class Source(mongo.EmbeddedDocument):
 
         for idx in range(to):
             dfTemp = self.transformations[idx].transform(dfTemp)
-        # self.transformedData = dfTemp
+
         return dfTemp
 
     def setSchema(self, mappedSchema):
@@ -140,7 +139,9 @@ class CSV(Source):
         fields = self.mappedSchema["fields"]
         cols = list(map(lambda x: x["name"], fields))
         types = {f["name"]: convertToPandasTypes(f["type"]) for f in fields}
-        self.dfSample = pd.read_csv(
+        log.info(cols)
+        log.info(types)
+        df = pd.read_csv(
             self.filePath,
             sep=self.separator,
             engine="python",
@@ -148,6 +149,7 @@ class CSV(Source):
             dtype=types,
             usecols=cols,
         )
+        return df
 
     def json(self):
         res = super().json()

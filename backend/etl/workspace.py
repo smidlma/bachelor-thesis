@@ -133,11 +133,11 @@ class WorkSpaceManager:
         if pipeline is None:
             return False
         print("task start")
+        result = pipeline.run()
+        await self.connectionManager.send("ASDF", result)
         # await asyncio.sleep(10)
-        print(pipeline)
-        await pipeline.run()
         print("task end")
-        return True
+        return result
 
     async def handleMsg(self, msg: dict):
         if msg["cmd"] == Command.INIT_STATE.value:

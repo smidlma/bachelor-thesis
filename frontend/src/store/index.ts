@@ -58,6 +58,9 @@ export default createStore({
   actions: {},
   modules: {},
   getters: {
+    socketConnection(state) {
+      return state.socket.isConnected
+    },
     currentPipeline(state) {
       return state.pipeline
     },

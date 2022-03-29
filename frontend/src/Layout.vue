@@ -17,10 +17,14 @@ import {
   NIcon,
   useLoadingBar,
   useMessage,
+  useNotification,
 } from 'naive-ui'
-import { ref, h, Component, PropType } from 'vue'
+import { ref, h, Component, PropType, watch, onMounted } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { Analytics, FileTray, Build } from '@vicons/ionicons5'
+import { useStore } from 'vuex'
+import { computed } from '@vue/reactivity'
+import store from './store'
 
 // const loadingBar = useLoadingBar()
 const props = defineProps({
@@ -89,6 +93,20 @@ router.beforeEach((to) => {
 router.afterEach(() => {
   loadingBar.finish()
 })
+// const store = useStore()
+const notification = useNotification()
+const serverIsConnected = computed(() => store.getters.socketConnection)
+watch(serverIsConnected, () => showConnInfo())
+
+onMounted(() => showConnInfo())
+
+const showConnInfo = () => {
+  if (serverIsConnected.value) {
+    notification.success({ content: 'Server connected', duration: 5000 })
+  } else {
+    notification.error({ content: 'Server is not connected', duration: 5000 })
+  }
+}
 </script>
 
 <template>

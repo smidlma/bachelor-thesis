@@ -11,77 +11,86 @@ import mongoengine as mongo
 import logging as log
 import pandas as pd
 
-mongo.connect("mongotest")
+DATABASE = "mongotest"
+db = mongo.connect(DATABASE)
+db.drop_database(DATABASE)
+
 log.basicConfig(format="%(asctime)s - %(message)s", level=log.NOTSET)
 
 
-# def test_csv():
-# csv = source.CSV('csv', 'mock.csv').save()
-# csvDB = source.CSV.objects(id=csv.id).first()
-
-# assert csv.id == csvDB.id
-
-
 def test_create_pipeline():
-
-    pipeline = Pipeline("Test pipeline")
+    pipeline = Pipeline("Pipeline A")
     csv = source.CSV("csv", "mock.csv")
-
+    sortT = transformation.Sort(position=0, column="first_name")
+    csv.addTransformation(sortT)
+    schema = {
+        "fields": [
+            {"name": "id", "type": "integer"},
+            {"name": "first_name", "type": "string"},
+            {"name": "gender", "type": "string"},
+        ],
+        "primaryKey": ["id"],
+    }
+    csv.setSchema(schema)
     connection = conn.PostgreSQLConnection(
         host="localhost", port=5432, user="smidlma", password="", database="warehouse"
     ).save()
-    dest = destination.PostgreSQLDest("testDest", "import", connection=connection)
-
+    dest = destination.PostgreSQLDest(
+        destinationName="MyWareHouse", targetTable="import", connection=connection
+    )
     pipeline.addSource(csv)
     pipeline.setDestination(dest)
+    pipeline.run()
     pipeline.save()
-    # postgres = source.PostgreSQL(name='Postgres',
-    #                              tableName='import', connection=connection).save()
-    log.info("hello")
-    # assert connection.connect() == True
 
 
 def test_load_run_pipeline():
-    pipeline = Pipeline.objects(name="Test pipeline").first()
+    pipeline = Pipeline.objects(name="Pipeline A").first()
     rows = pipeline.runTest()
     assert rows == 1000
 
 
-def test_local_transformation():
-    sortT = transformation.Sort(position=0, column="first_name")
-    sortT2 = transformation.Sort(position=0, column="ip_address")
-    csv = source.CSV("csv", "mock.csv")
-    csv.addTransformation(sortT)
-    csv.addTransformation(sortT2)
-    res = csv.runTransformations()
-    log.info(res)
-
-
-def test_global_transformations():
-    pip = Pipeline("My pip")
+def test_create_pacient_pipeline():
+    pipeline = Pipeline("Hospital pipeline")
     connection = conn.PostgreSQLConnection(
         host="localhost", port=5432, user="smidlma", password="", database="warehouse"
     ).save()
     dest = destination.PostgreSQLDest("testDest", "import", connection=connection)
-    sortT = transformation.Sort(position=0, column="LabUnits")
-    sortT2 = transformation.Sort(position=0, column="PatientLanguage")
-    csv = source.CSV("Labs", "LabsCorePopulatedTable.txt")
-    csv2 = source.CSV("Pacients", "PatientCorePopulatedTable.txt")
-    csv.addTransformation(sortT)
-    csv2.addTransformation(sortT2)
-    join = source.Join(name="Join", s1=csv, s2=csv2, on="PatientID", how="left")
-    pip.setDestination(dest)
-    pip.addJoin(join)
-    pip.addSource(csv)
-    pip.addSource(csv2)
-    pip.save()
-    pip.run()
+    pipeline.setDestination(dest)
+    pipeline.save()
 
 
-def test_load_pip_and_run():
-    pipeline = Pipeline.objects(name="My pip").first()
-    pipeline.run()
+# def test_local_transformation():
+#     sortT = transformation.Sort(position=0, column="first_name")
+#     sortT2 = transformation.Sort(position=0, column="ip_address")
+#     csv = source.CSV("csv", "mock.csv")
+#     csv.addTransformation(sortT)
+#     csv.addTransformation(sortT2)
+#     res = csv.runTransformations()
+#     log.info(res)
 
 
-# def load_from_schema():
-#     mockDf = pd.read_csv('file-storage/mock.csv')
+# def test_global_transformations():
+#     pip = Pipeline("My pip")
+#     connection = conn.PostgreSQLConnection(
+#         host="localhost", port=5432, user="smidlma", password="", database="warehouse"
+#     ).save()
+#     dest = destination.PostgreSQLDest("testDest", "import", connection=connection)
+#     sortT = transformation.Sort(position=0, column="LabUnits")
+#     sortT2 = transformation.Sort(position=0, column="PatientLanguage")
+#     csv = source.CSV("Labs", "LabsCorePopulatedTable.txt")
+#     csv2 = source.CSV("Pacients", "PatientCorePopulatedTable.txt")
+#     csv.addTransformation(sortT)
+#     csv2.addTransformation(sortT2)
+#     join = source.Join(name="Join", s1=csv, s2=csv2, on="PatientID", how="left")
+#     pip.setDestination(dest)
+#     pip.addJoin(join)
+#     pip.addSource(csv)
+#     pip.addSource(csv2)
+#     pip.save()
+#     pip.run()
+
+
+# def test_load_pip_and_run():
+#     pipeline = Pipeline.objects(name="My pip").first()
+#     pipeline.run()

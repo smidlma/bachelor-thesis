@@ -5,9 +5,13 @@ export default function () {
   const API_URL = `http://localhost:${PORT}/api`
 
   const getAll = async (endpoint: string): Promise<Array<any>> => {
-    const resp = await fetch(`${API_URL}/${endpoint}`)
-    const data = await resp.json()
-    return data
+    try {
+      const resp = await fetch(`${API_URL}/${endpoint}`)
+      const data = await resp.json()
+      return data
+    } catch {
+      return []
+    }
   }
 
   const post = async (endpoint: string, body: any) => {

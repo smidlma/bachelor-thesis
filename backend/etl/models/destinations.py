@@ -1,3 +1,4 @@
+from email.policy import default
 from enum import Enum
 from pandas import DataFrame
 import etl.models.connections as con
@@ -20,6 +21,7 @@ class Destination(mongo.EmbeddedDocument):
     destinationName = mongo.StringField()
     targetTable = mongo.StringField()
     connection = mongo.ReferenceField(con.Connection)
+    insertOption = mongo.StringField(default=InsertOption.REPLACE.value)
 
     meta = {"allow_inheritance": True}
 
@@ -33,12 +35,12 @@ class Destination(mongo.EmbeddedDocument):
             **data
         )
 
-    def load(self, df: DataFrame, tableOption: InsertOption):
+    def load(self, df: DataFrame):
         if not self.connection.isConnected():
             self.connection.connect()
 
         rowsAffected = df.to_sql(
-            self.targetTable, self.connection.con, if_exists=tableOption.value
+            self.targetTable, self.connection.con, if_exists=self.insertOption
         )
         return rowsAffected
 
@@ -47,7 +49,7 @@ class Destination(mongo.EmbeddedDocument):
             "id": str(self.id),
             "destinationName": self.destinationName,
             "targetTable": self.targetTable,
-            "connection": self.connection.json()
+            "connection": self.connection.json(),
         }
 
 
@@ -62,5 +64,6 @@ class PostgreSQLDest(Destination):
             connection=connection,
             **data
         )
+
     def json(self):
         return super().json()

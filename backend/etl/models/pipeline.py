@@ -1,5 +1,7 @@
 import asyncio
 from time import sleep
+
+from pandas import DataFrame
 import etl.models.transformations as tr
 import etl.models.sources as source
 import etl.models.destinations as dest
@@ -38,35 +40,37 @@ class Pipeline(mongo.Document):
 
     def runTest(self):
         log.debug(f"Running pipeline: {self.name}")
-        df = self.sources[0].extract()
-        affected = self.destination.load(df, dest.InsertOption.REPLACE)
+        df = self.sources[0].runTransformations()
+        affected = self.destination.load(df)
         log.debug(f"Rows affected: {affected}")
         return affected
 
-    async def run(self):
+    def run(self):
         try:
             transformedSource = dict()
             # Run local trans of sources and save to dict
+            lastTransformedId = None
             for source in self.sources:
+                lastTransformedId = source.id
                 transformedSource[source.id] = source.runTransformations()
-                # log.info(source.id)
 
-            # log.info(transformedSource)
-
+            # Run joins of sources
             for join in self.joins:
+                lastTransformedId = join.id
                 transformedSource[join.id] = join.join(
                     transformedSource.get(join.s1.id), transformedSource.get(join.s2.id)
                 )
-
                 log.info(transformedSource[join.id])
-            print("going to sleep")
-            await asyncio.sleep(10)
-            return {"success": True}
+
+            # Call destination to load df to db
+            rowsAffected = self.moveToDestination(transformedSource[lastTransformedId])
+
+            return {"success": True, "rowsAffected": rowsAffected}
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    def moveToDestination(self):
-        pass
+    def moveToDestination(self, df: DataFrame):
+        return self.destination.load(df)
 
     def json(self):
         return {
