@@ -18,6 +18,16 @@ db.drop_database(DATABASE)
 log.basicConfig(format="%(asctime)s - %(message)s", level=log.NOTSET)
 
 
+def test_date_filter():
+    f = transformation.DateFilter(
+        position=0,
+        column="ASDF",
+        op="gt",
+        datetimes=["1183135260000"],
+    )
+    log.info(f.json())
+
+
 def test_create_pipeline():
     pipeline = Pipeline("Pipeline A")
     csv = source.CSV("csv", "mock.csv")

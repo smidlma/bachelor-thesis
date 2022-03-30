@@ -1,16 +1,25 @@
 <script setup lang="ts">
-import { FormInst, NForm, NFormItem, NSelect, NCard, NButton } from 'naive-ui'
+import {
+  FormInst,
+  NForm,
+  NFormItem,
+  NSelect,
+  NCard,
+  NButton,
+  NDrawer,
+  NDrawerContent,
+  NDivider,
+} from 'naive-ui'
 import { PropType, ref } from 'vue'
 import { Join, Source } from '../../types/Pipeline'
-import SSourcePreview from '../SSourcePreview/SSourcePreview.vue'
 import useSocket from '../../use/socket'
 import { ADD_JOIN } from '../../utils/commands'
-import { Add } from '@vicons/ionicons5'
 const props = defineProps({
   editable: { type: Boolean, default: false },
   join: {
     type: Object as PropType<Join>,
     default: {
+      id: null,
       s1: { id: null },
       s2: { id: null },
       how: null,
@@ -30,6 +39,7 @@ const createForm = ref({
 
 const formRef = ref<FormInst | null>(null)
 
+const activeDrawer = ref(false)
 const rules = {
   s1: {
     required: true,
@@ -48,16 +58,25 @@ const rules = {
   },
 }
 
+const handleCreateOrUpdate = (data: any) => {
+  let body = null
+  if (props.join.id) {
+    body = { id: props.join.id, ...data }
+  } else {
+    body = { id: null, ...data }
+  }
+
+  socket.sendToServer(ADD_JOIN, body)
+}
+
 const handleValidateClick = (e: MouseEvent) => {
   e.preventDefault()
   formRef.value?.validate((errors) => {
     if (!errors) {
-      //   message.success('Valid')
-      socket.sendToServer(ADD_JOIN, { ...createForm.value })
+      handleCreateOrUpdate(createForm.value)
       emit('add')
     } else {
       console.log(errors)
-      //   message.error('Invalid')
     }
   })
 }
@@ -65,6 +84,8 @@ const handleValidateClick = (e: MouseEvent) => {
 
 <template>
   <NCard>
+    <NButton v-if="!props.editable" @click="activeDrawer = true">Edit</NButton>
+    <NDivider></NDivider>
     <NForm
       ref="formRef"
       :model="createForm"
@@ -113,6 +134,12 @@ const handleValidateClick = (e: MouseEvent) => {
       <!-- <NFormItem label="On"></NFormItem> -->
     </NForm>
     <NButton v-if="props.editable" @click="handleValidateClick">Save</NButton>
+    <NDrawer placement="right" :width="612" v-model:show="activeDrawer">
+      <NDrawerContent>
+        <template #header> Join configuration </template>
+        <SJoin :join="props.join" :sources="props.sources" :editable="true" />
+      </NDrawerContent>
+    </NDrawer>
     <!-- <SSourcePreview
       :schema="props.join.defaultSchema"
       :data="props.join.preview"

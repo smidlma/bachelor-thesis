@@ -85,9 +85,18 @@ class PipelineBuilder:
         how = data["how"]
         s1 = next(filter(lambda x: str(x.id) == s1ID, self.pipeline.sources), None)
         s2 = next(filter(lambda x: str(x.id) == s2ID, self.pipeline.sources), None)
-        join = Join(s1=s1, s2=s2, how=how)
-        self.pipeline.addJoin(join)
-        self.pipeline.save()
+        if data["id"] is None:
+            join = Join(s1=s1, s2=s2, how=how)
+            self.pipeline.addJoin(join)
+            self.pipeline.save()
+        else:
+            j = next(
+                filter(lambda x: str(x.id) == data["id"], self.pipeline.joins),
+                None,
+            )
+            
+            j.update(s1, s2, how)
+            self.pipeline.save()
 
     def addTransformation(self, data):
         s = next(

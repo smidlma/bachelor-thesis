@@ -82,6 +82,9 @@ class Source(mongo.EmbeddedDocument):
     def setSchema(self, mappedSchema):
         self.mappedSchema = mappedSchema
 
+    def update(self, data):
+        pass
+
     def json(self):
         return {
             "id": str(self.id),
@@ -233,6 +236,11 @@ class Join(Source):
 
     def extract(self) -> pd.DataFrame:
         return None
+
+    def update(self, s1, s2, how):
+        self.s1 = s1
+        self.s2 = s2
+        self.how = how
 
     def json(self):
         res = {

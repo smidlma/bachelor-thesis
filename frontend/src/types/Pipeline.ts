@@ -8,6 +8,7 @@ interface Pipeline {
 }
 
 interface Join {
+  id: string
   s1: Source
   s2: Source
   how: string
