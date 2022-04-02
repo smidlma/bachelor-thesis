@@ -104,7 +104,7 @@ class Source(mongo.EmbeddedDocument):
 class CSV(Source):
     fileName = mongo.StringField()
     filePath = mongo.StringField()
-    separator = mongo.StringField(default=",|;|\t")
+    separator = mongo.StringField(default="\t")
 
     def __init__(self, name: str, fileName: str, **data) -> None:
         if "filePath" not in data:

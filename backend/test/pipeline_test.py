@@ -18,55 +18,92 @@ db.drop_database(DATABASE)
 log.basicConfig(format="%(asctime)s - %(message)s", level=log.NOTSET)
 
 
-def test_date_filter():
-    f = transformation.DateFilter(
-        position=0,
-        column="ASDF",
-        op="gt",
-        datetimes=["1183135260000"],
+def test_create_hospital_pipeline():
+    # Create pipeline
+    pipeline = Pipeline("Hospital")
+    # Create conn and save
+    connection = conn.PostgreSQLConnection(
+        host="localhost", port=5432, user="smidlma", password="", database="warehouse"
+    ).save()
+    # Create dest
+    dest = destination.PostgreSQLDest(
+        "Warehouse", "hospital", connection=connection, insertOption="replace"
     )
-    log.info(f.json())
+    # Set dest to pipeline
+    pipeline.setDestination(dest)
 
-
-def test_create_pipeline():
-    pipeline = Pipeline("Pipeline A")
-    csv = source.CSV("csv", "mock.csv")
-    sortT = transformation.Sort(position=0, column="first_name")
-    csv.addTransformation(sortT)
-    schema = {
+    # Create source
+    pacientCSV = source.CSV(name="Pacients", fileName="PatientCorePopulatedTable.txt")
+    mappedSchemaPacients = {
         "fields": [
-            {"name": "id", "type": "integer"},
-            {"name": "first_name", "type": "string"},
-            {"name": "gender", "type": "string"},
+            {"name": "PatientID", "type": "string"},
+            {"name": "PatientGender", "type": "string"},
+            {"name": "PatientDateOfBirth", "type": "datetime"},
+            {"name": "PatientRace", "type": "string"},
+            {"name": "PatientMaritalStatus", "type": "string"},
+            {"name": "PatientLanguage", "type": "string"},
+            {"name": "PatientPopulationPercentageBelowPoverty", "type": "number"},
         ],
-        "primaryKey": ["id"],
+        "primaryKey": ["PatientID"],
     }
-    csv.setSchema(schema)
-    connection = conn.PostgreSQLConnection(
-        host="localhost", port=5432, user="smidlma", password="", database="warehouse"
-    ).save()
-    dest = destination.PostgreSQLDest(
-        destinationName="MyWareHouse",
-        targetTable="mock",
-        connection=connection,
-        insertOption="append",
-    )
-    pipeline.addSource(csv)
-    pipeline.setDestination(dest)
-    pipeline.run()
+    pacientCSV.setSchema(mappedSchemaPacients)
+
+    labsCSV = source.CSV(name="Labs", fileName="LabsCorePopulatedTable.txt")
+    mappedSchemaLabs = {
+        "fields": [
+            {"name": "PatientID", "type": "string"},
+            {"name": "AdmissionID", "type": "integer"},
+            {"name": "LabValue", "type": "number"},
+            {"name": "LabUnits", "type": "string"},
+            {"name": "LabDateTime", "type": "string"},
+        ]
+    }
+    labsCSV.setSchema(mappedSchemaLabs)
+
+    pipeline.addSource(pacientCSV)
+    pipeline.addSource(labsCSV)
     pipeline.save()
 
 
-def test_create_pacient_pipeline():
-    pipeline = Pipeline("Hospital pipeline")
-    connection = conn.PostgreSQLConnection(
-        host="localhost", port=5432, user="smidlma", password="", database="warehouse"
-    ).save()
-    dest = destination.PostgreSQLDest(
-        "testDest", "hospital", connection=connection, insertOption="append"
-    )
-    pipeline.setDestination(dest)
-    pipeline.save()
+# def test_create_pipeline():
+#     pipeline = Pipeline("Pipeline A")
+#     csv = source.CSV("csv", "mock.csv")
+#     sortT = transformation.Sort(position=0, column="first_name")
+#     csv.addTransformation(sortT)
+#     schema = {
+#         "fields": [
+#             {"name": "id", "type": "integer"},
+#             {"name": "first_name", "type": "string"},
+#             {"name": "gender", "type": "string"},
+#         ],
+#         "primaryKey": ["id"],
+#     }
+#     csv.setSchema(schema)
+#     connection = conn.PostgreSQLConnection(
+#         host="localhost", port=5432, user="smidlma", password="", database="warehouse"
+#     ).save()
+#     dest = destination.PostgreSQLDest(
+#         destinationName="MyWareHouse",
+#         targetTable="mock",
+#         connection=connection,
+#         insertOption="append",
+#     )
+#     pipeline.addSource(csv)
+#     pipeline.setDestination(dest)
+#     pipeline.run()
+#     pipeline.save()
+
+
+# def test_create_pacient_pipeline():
+#     pipeline = Pipeline("Hospital pipeline")
+#     connection = conn.PostgreSQLConnection(
+#         host="localhost", port=5432, user="smidlma", password="", database="warehouse"
+#     ).save()
+#     dest = destination.PostgreSQLDest(
+#         "testDest", "hospital", connection=connection, insertOption="append"
+#     )
+#     pipeline.setDestination(dest)
+#     pipeline.save()
 
 
 # def test_local_transformation():
