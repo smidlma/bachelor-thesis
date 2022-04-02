@@ -46,7 +46,10 @@ def test_create_pipeline():
         host="localhost", port=5432, user="smidlma", password="", database="warehouse"
     ).save()
     dest = destination.PostgreSQLDest(
-        destinationName="MyWareHouse", targetTable="import", connection=connection
+        destinationName="MyWareHouse",
+        targetTable="import",
+        connection=connection,
+        insertOption="append",
     )
     pipeline.addSource(csv)
     pipeline.setDestination(dest)
@@ -54,18 +57,14 @@ def test_create_pipeline():
     pipeline.save()
 
 
-def test_load_run_pipeline():
-    pipeline = Pipeline.objects(name="Pipeline A").first()
-    rows = pipeline.runTest()
-    assert rows == 1000
-
-
 def test_create_pacient_pipeline():
     pipeline = Pipeline("Hospital pipeline")
     connection = conn.PostgreSQLConnection(
         host="localhost", port=5432, user="smidlma", password="", database="warehouse"
     ).save()
-    dest = destination.PostgreSQLDest("testDest", "import", connection=connection)
+    dest = destination.PostgreSQLDest(
+        "testDest", "import", connection=connection, insertOption="append"
+    )
     pipeline.setDestination(dest)
     pipeline.save()
 

@@ -4,7 +4,9 @@ from typing import Optional
 from fastapi import FastAPI, Request, UploadFile, WebSocket
 from fastapi.responses import HTMLResponse
 import mongoengine as mongo
+import pandas as pd
 from etl.models.connections import Connection, PostgreSQLConnection
+from etl.models.destinations import Destination, PostgreSQLDest
 from etl.models.pipeline import Pipeline
 import logging as log
 import etl.config as config
@@ -19,6 +21,14 @@ class ConnectionModel(BaseModel):
     user: str
     password: Optional[str] = None
     database: str
+
+
+class PipelineModel(BaseModel):
+    pipelineName: str
+    destinationName: str
+    connectionId: str
+    targetTable: str
+    insertOption: str
 
 
 app = FastAPI()
@@ -42,47 +52,9 @@ log.basicConfig(
 app.include_router(ws.router)
 
 
-html = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Chat</title>
-    </head>
-    <body>
-        <h1>WebSocket Chat</h1>
-        <form action="" onsubmit="sendMessage(event)">
-            <input type="text" id="messageText" autocomplete="off"/>
-            <button>Send</button>
-        </form>
-        <ul id='messages'>
-        </ul>
-        <script>
-            var ws = new WebSocket("ws://localhost:8000/ws");
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('messages')
-                var message = document.createElement('li')
-                var content = document.createTextNode(event.data)
-                message.appendChild(content)
-                messages.appendChild(message)
-            };
-            function sendMessage(event) {
-                var input = document.getElementById("messageText")
-                ws.send(input.value)
-                input.value = ''
-                event.preventDefault()
-            }
-        </script>
-    </body>
-</html>
-"""
-
-# @app.on_event('startup')
-# def startup():
-#     mongo.connect('mongotest')
 @app.get("/")
 async def get():
-    return HTMLResponse(html)
-    # return {file.filename}
+    return {"Hello": "World"}
 
 
 ########## Manage pipelines ##########
@@ -95,14 +67,30 @@ async def get():
 
 
 @app.post("/api/pipelines")
-async def createPipeline():
-    return {"Not Implemented"}
+async def createPipeline(body: PipelineModel):
+    try:
+        con = Connection.objects(id=body.connectionId).first()
+        dest = PostgreSQLDest(
+            destinationName=body.destinationName,
+            targetTable=body.targetTable,
+            insertOption=body.insertOption,
+            connection=con,
+        )
+        pipeline = Pipeline(name=body.pipelineName)
+        pipeline.setDestination(dest)
+        pipeline.save()
+        return {"created": True}
+    except Exception as e:
+        return {"created": False, "error": e}
+
+
+async def runPipeline():
+    pass
 
 
 ########## Manage connections ##########
 @app.get("/api/connections")
 async def getConnections():
-    await sleep(10)
     connections = Connection.objects()
     return [c.json() for c in connections]
 
@@ -139,16 +127,28 @@ async def getFiles():
         lambda x: os.path.isfile(os.path.join(dir_name, x)), os.listdir(dir_name)
     )
     files_with_size = [
-        (file_name, os.stat(os.path.join(dir_name, file_name)).st_size)
+        (
+            file_name,
+            os.stat(os.path.join(dir_name, file_name)).st_size,
+        )
         for file_name in list_of_files
     ]
-    print(files_with_size)
     for fileName, fileSize in files_with_size:
-        files.append({"fileName": fileName, "fileSize": fileSize})
+        f = open(f"{dir_name}/{fileName}", "r")
+        lines = [f.readline() for i in range(20)]
+        f.close()
+        files.append({"fileName": fileName, "fileSize": fileSize, "filePreview": lines})
 
     return files
 
 
 @app.post("/api/files/upload")
 async def uploadFile(file: UploadFile):
-    return {"Not Implemented"}
+    try:
+        content = await file.read()
+        open(f"file-storage/{file.filename}", "wb").write(content)
+        return {
+            "upload": True,
+        }
+    except Exception as e:
+        return {"upload": False, "error": e}

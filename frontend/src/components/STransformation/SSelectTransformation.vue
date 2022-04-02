@@ -4,7 +4,7 @@ import { NSelect } from 'naive-ui'
 const props = defineProps({
   default: { type: String, default: 'Sort' },
 })
-const options = ['Sort', 'Mask']
+const options = ['Sort', 'Mask', 'DateFilter', 'ValueFilter']
 
 const selectOptions = options.map((x) => {
   return { label: x, value: x }

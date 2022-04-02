@@ -26,12 +26,18 @@ class Destination(mongo.EmbeddedDocument):
     meta = {"allow_inheritance": True}
 
     def __init__(
-        self, destinationName: str, targetTable: str, connection: con.Connection, **data
+        self,
+        destinationName: str,
+        targetTable: str,
+        connection: con.Connection,
+        insertOption: str,
+        **data
     ) -> None:
         super(Destination, self).__init__(
             destinationName=destinationName,
             targetTable=targetTable.lower(),
             connection=connection,
+            insertOption=insertOption,
             **data
         )
 
@@ -56,12 +62,18 @@ class Destination(mongo.EmbeddedDocument):
 # PostgreSQL destination class
 class PostgreSQLDest(Destination):
     def __init__(
-        self, destinationName: str, targetTable: str, connection: con.Connection, **data
+        self,
+        destinationName: str,
+        targetTable: str,
+        connection: con.Connection,
+        insertOption: str,
+        **data
     ) -> None:
         super(PostgreSQLDest, self).__init__(
             destinationName=destinationName,
             targetTable=targetTable.lower(),
             connection=connection,
+            insertOption=insertOption,
             **data
         )
 

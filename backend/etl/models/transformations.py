@@ -75,7 +75,7 @@ class MaskColumn(Transformation):
 class DateFilter(Transformation):
     column = mongo.StringField()
     op = mongo.StringField()
-    datetimes = mongo.ListField(mongo.DateTimeField())
+    datetimes = mongo.ListField()
 
     def __init__(self, *args, **values):
         if "name" not in values:

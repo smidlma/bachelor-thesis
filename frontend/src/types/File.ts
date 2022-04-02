@@ -1,6 +1,7 @@
 interface FileType {
   fileName: string
-  fileSize: string
+  fileSize: number
+  filePreview: Array<string>
 }
 
 export default FileType

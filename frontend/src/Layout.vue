@@ -5,8 +5,6 @@ import {
   NLayoutHeader,
   NLayoutFooter,
   NMenu,
-  darkTheme,
-  NConfigProvider,
   NLayoutSider,
   GlobalTheme,
   NLayoutContent,
@@ -16,8 +14,9 @@ import {
   MenuOption,
   NIcon,
   useLoadingBar,
-  useMessage,
   useNotification,
+  NDrawer,
+  NDrawerContent,
 } from 'naive-ui'
 import { ref, h, Component, PropType, watch, onMounted } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
@@ -25,8 +24,10 @@ import { Analytics, FileTray, Build } from '@vicons/ionicons5'
 import { useStore } from 'vuex'
 import { computed } from '@vue/reactivity'
 import store from './store'
-
-// const loadingBar = useLoadingBar()
+import SPipelineCreate from './components/SPipelineCreate/SPipelineCreate.vue'
+import { Pipeline } from './types/Pipeline'
+import useRest from './use/rest'
+const rest = useRest()
 const props = defineProps({
   theme: { type: Object as PropType<GlobalTheme | null>, default: null },
 })
@@ -107,6 +108,22 @@ const showConnInfo = () => {
     notification.error({ content: 'Server is not connected', duration: 5000 })
   }
 }
+
+const activeDrawer = ref(false)
+
+const createPipeline = async (data: Object) => {
+  activeDrawer.value = false
+  const result = await rest.createPipeline(data)
+  if (result.created) {
+    notification.success({ content: 'Pipeline created', duration: 2000 })
+    router.push({ name: 'Editor' })
+  } else {
+    notification.error({
+      content: `Not created: ${result.error}`,
+      duration: 2000,
+    })
+  }
+}
 </script>
 
 <template>
@@ -121,15 +138,7 @@ const showConnInfo = () => {
         </template>
         <template #extra>
           <NSpace>
-            <NButton
-              @click="
-                () => {
-                  // @ts-ignore: Unreachable code error
-                  $socket.sendObj({ cmd: 'RUN_PIPELINE' })
-                }
-              "
-              >Create pipeline</NButton
-            >
+            <NButton @click="activeDrawer = true">Create pipeline</NButton>
             <NButton v-if="props.theme" @click="emit('changeTheme', 'light')"
               >Light</NButton
             >
@@ -157,6 +166,11 @@ const showConnInfo = () => {
       <NLayout content-style="padding: 24px;">
         <NLayoutContent>
           <router-view />
+          <NDrawer v-model:show="activeDrawer" :width="800" placement="right">
+            <NDrawerContent title="Pipeline">
+              <SPipelineCreate @create="createPipeline" />
+            </NDrawerContent>
+          </NDrawer>
         </NLayoutContent>
       </NLayout>
     </NLayout>

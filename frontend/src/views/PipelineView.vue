@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, onUpdated, ref } from 'vue'
 import { Pipeline } from '../types/Pipeline'
 import useRest from '../use/rest'
 import SPipeline from '../components/SPipeline/SPipeline.vue'

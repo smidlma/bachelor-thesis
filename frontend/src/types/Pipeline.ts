@@ -34,6 +34,7 @@ interface Source {
 }
 
 interface Connection {
+  id: string
   host: string
   port: number
   user: string

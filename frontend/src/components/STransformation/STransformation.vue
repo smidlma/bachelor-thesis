@@ -7,6 +7,8 @@ import SSelectTransformation from './SSelectTransformation.vue'
 import useSocket from '../../use/socket'
 import { ADD_TRANSFORMATION } from '../../utils/commands'
 import SMask from './SMask.vue'
+import SDateFilter from './SDateFilter.vue'
+import SValueFilter from './SValueFilter.vue'
 const props = defineProps({
   sourceId: { type: String, required: false },
   transformation: { type: Object, default: null },
@@ -58,6 +60,26 @@ const activeDrawer = ref(false)
       <SMask
         :editable="props.editable"
         :columns="props.schema?.fields"
+        :transformation="props.transformation"
+        @save="handleCreateOrUpdate"
+      />
+    </div>
+    <div v-else-if="showType === 'DateFilter'">
+      <SDateFilter
+        :editable="props.editable"
+        :columns="props.schema?.fields.filter((x) => x.type == 'datetime')"
+        :transformation="props.transformation"
+        @save="handleCreateOrUpdate"
+      />
+    </div>
+    <div v-else-if="showType === 'ValueFilter'">
+      <SValueFilter
+        :editable="props.editable"
+        :columns="
+          props.schema?.fields.filter(
+            (x) => x.type == 'integer' || x.type == 'number'
+          )
+        "
         :transformation="props.transformation"
         @save="handleCreateOrUpdate"
       />

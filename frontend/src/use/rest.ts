@@ -29,17 +29,10 @@ export default function () {
   // Get all files on the server
   const getFiles = async (): Promise<Array<any>> => {
     return await getAll('files')
-    // const resp = await fetch(`${API_URL}/files`)
-    // const data = await resp.json()
-    // return data
   }
 
   const getConnections = async (): Promise<Array<any>> => {
     return await getAll('connections')
-
-    // const resp = await fetch(`${API_URL}/connections`)
-    // const data = await resp.json()
-    // return data
   }
 
   const getPipelines = async (): Promise<Array<Pipeline>> => {
@@ -49,5 +42,17 @@ export default function () {
   const testConnection = async (body: any): Promise<any> => {
     return await post('connections/test', body)
   }
-  return { getFiles, getConnections, testConnection, getPipelines }
+
+  const createPipeline = async (body: any): Promise<any> => {
+    return await post('pipelines', body)
+  }
+
+  return {
+    getFiles,
+    getConnections,
+    testConnection,
+    getPipelines,
+    createPipeline,
+    API_URL,
+  }
 }

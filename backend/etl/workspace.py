@@ -4,7 +4,7 @@ from typing import List
 from fastapi import WebSocket
 from etl.models.pipeline import Pipeline
 from etl.models.sources import CSV, Join
-from etl.models.transformations import MaskColumn, Sort
+from etl.models.transformations import DateFilter, MaskColumn, Sort, ValueFilter
 
 
 class TranformationFactory:
@@ -18,6 +18,20 @@ class TranformationFactory:
             )
         elif data["type"] == "Mask":
             return MaskColumn(column=data["column"], position=data["position"])
+        elif data["type"] == "DateFilter":
+            return DateFilter(
+                column=data["column"],
+                position=data["position"],
+                op=data["op"],
+                datetimes=data["datetimes"],
+            )
+        elif data["type"] == "ValueFilter":
+            return ValueFilter(
+                column=data["column"],
+                position=data["position"],
+                op=data["op"],
+                vals=data["vals"],
+            )
 
 
 class Command(Enum):
@@ -94,7 +108,7 @@ class PipelineBuilder:
                 filter(lambda x: str(x.id) == data["id"], self.pipeline.joins),
                 None,
             )
-            
+
             j.update(s1, s2, how)
             self.pipeline.save()
 

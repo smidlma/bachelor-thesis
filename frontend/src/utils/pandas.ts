@@ -9,4 +9,10 @@ const pandasDataTypes: Array<SelectOption> = [
   { label: 'datetime', value: 'datetime' },
 ]
 
-export { pandasDataTypes }
+const insertOptions: Array<SelectOption> = [
+  { label: 'APPEND', value: 'append' },
+  { label: 'REPLACE', value: 'replace' },
+  { label: 'FAIL', value: 'fail' },
+]
+
+export { pandasDataTypes, insertOptions }
