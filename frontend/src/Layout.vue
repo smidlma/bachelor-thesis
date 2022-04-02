@@ -21,11 +21,9 @@ import {
 } from 'naive-ui'
 import { ref, h, Component, PropType, watch, onMounted } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
-import { Analytics, FileTray, Build } from '@vicons/ionicons5'
+import { Analytics, FileTray, Build, Flash } from '@vicons/ionicons5'
 import { useStore } from 'vuex'
-import { computed } from '@vue/reactivity'
 import SPipelineCreate from './components/SPipelineCreate/SPipelineCreate.vue'
-import { Pipeline } from './types/Pipeline'
 import useRest from './use/rest'
 
 const rest = useRest()
@@ -64,6 +62,20 @@ const menuOptions: MenuOption[] = [
       ),
     key: 'files',
     icon: renderIcon(FileTray),
+  },
+  {
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: {
+            name: 'Connections',
+          },
+        },
+        { default: () => 'Connections' }
+      ),
+    key: 'connections',
+    icon: renderIcon(Flash),
   },
   {
     label: () =>

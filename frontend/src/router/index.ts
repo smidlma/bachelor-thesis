@@ -13,6 +13,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/FileView.vue'),
   },
   {
+    path: '/connections',
+    name: 'Connections',
+    component: () => import('../views/ConnectionsView.vue'),
+  },
+  {
     path: '/editor',
     name: 'Editor',
     component: () => import('../views/PipelineEditorView.vue'),

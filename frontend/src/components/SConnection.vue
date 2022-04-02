@@ -6,8 +6,14 @@ import {
   NInput,
   NButton,
   NInputNumber,
+  FormRules,
+  NIcon,
+  NCard,
+  NIconWrapper,
+  NPageHeader,
 } from 'naive-ui'
 import { PropType, ref } from 'vue'
+import { Flash } from '@vicons/ionicons5'
 import { Connection } from '../types/Pipeline'
 import useRest from '../use/rest'
 const props = defineProps({
@@ -16,6 +22,7 @@ const props = defineProps({
     default: { host: '', port: null, user: '', password: '', database: '' },
   },
   editable: { type: Boolean, default: false },
+  preview: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['connectionStatus'])
@@ -29,7 +36,7 @@ const formValue = ref({
   database: props.connection.database,
 })
 
-const rules = {
+const rules: FormRules = {
   host: {
     required: true,
     message: 'Please input host name',
@@ -78,6 +85,7 @@ const validateConnection = async () => {
 
 <template>
   <NForm
+    v-if="!props.preview"
     ref="formRef"
     :label-width="80"
     :model="formValue"
@@ -115,5 +123,33 @@ const validateConnection = async () => {
       <NButton @click="handleValidateClick"> Test Connection </NButton>
     </NFormItem>
   </NForm>
+  <NCard v-else>
+    <NPageHeader
+      :subtitle="`${props.connection.user}:###@${props.connection.host}:${props.connection.port}/${props.connection.database}`"
+    >
+      <template #title>Connection: </template>
+      <template #avatar>
+        <NIconWrapper color="rgba(99, 226, 183, 0.16)" :size="40">
+          <NIcon :size="32" color="#63e2b7">
+            <Flash />
+          </NIcon>
+        </NIconWrapper>
+        <!-- <NAvatar
+          src="https://cdnimg103.lizhi.fm/user/2017/02/04/2583325032200238082_160x160.jpg"
+        /> -->
+      </template>
+      <template #extra>
+        <!-- <NSpace>
+          <NButton v-if="!props.editor" @click="emit('open', props.pipeline.id)"
+            >Open</NButton
+          >
+          <NSpace v-else>
+            <NButton @click="emit('run', props.pipeline.id)">Run</NButton>
+            <NButton @click="emit('close', props.pipeline.id)">Close</NButton>
+          </NSpace>
+        </NSpace> -->
+      </template>
+    </NPageHeader>
+  </NCard>
 </template>
 <style></style>

@@ -3,7 +3,6 @@ import {
   NPageHeader,
   NSpace,
   NButton,
-  NAvatar,
   NEmpty,
   NGrid,
   NGi,
@@ -12,13 +11,14 @@ import {
   NText,
   NP,
   NUploadDragger,
+  NIconWrapper,
   NIcon,
 } from 'naive-ui'
 import { onMounted, ref } from 'vue'
 import SFile from '../components/SFile/SFile.vue'
 import FileType from '../types/File'
 import useRest from '../use/rest'
-import { Archive } from '@vicons/ionicons5'
+import { Archive, FileTray } from '@vicons/ionicons5'
 const rest = useRest()
 const files = ref<FileType[]>([])
 
@@ -34,9 +34,11 @@ onMounted(async () => {
     <NPageHeader :subtitle="`Uploaded files: ${files.length}`">
       <template #title>Uploaded Files</template>
       <template #avatar>
-        <NAvatar
-          src="https://cdnimg103.lizhi.fm/user/2017/02/04/2583325032200238082_160x160.jpg"
-        />
+        <NIconWrapper color="rgba(99, 226, 183, 0.16)" :size="40">
+          <NIcon :size="32" color="#63e2b7">
+            <FileTray />
+          </NIcon>
+        </NIconWrapper>
       </template>
       <template #extra>
         <NSpace>
