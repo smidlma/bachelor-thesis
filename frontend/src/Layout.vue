@@ -18,10 +18,17 @@ import {
   NDrawer,
   NDrawerContent,
   useMessage,
+  NIconWrapper,
 } from 'naive-ui'
 import { ref, h, Component, PropType, watch, onMounted } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
-import { Analytics, FileTray, Build, Flash } from '@vicons/ionicons5'
+import {
+  Analytics,
+  FileTray,
+  Build,
+  Flash,
+  GitNetwork,
+} from '@vicons/ionicons5'
 import { useStore } from 'vuex'
 import SPipelineCreate from './components/SPipelineCreate/SPipelineCreate.vue'
 import useRest from './use/rest'
@@ -141,9 +148,11 @@ const createPipeline = async (data: Object) => {
       <NPageHeader>
         <template #title>ETL tool</template>
         <template #avatar>
-          <NAvatar
-            src="https://cdnimg103.lizhi.fm/user/2017/02/04/2583325032200238082_160x160.jpg"
-          />
+          <NIconWrapper color="rgba(99, 226, 183, 0.16)" :size="40">
+            <NIcon :size="32" color="#63e2b7">
+              <GitNetwork />
+            </NIcon>
+          </NIconWrapper>
         </template>
         <template #extra>
           <NSpace>

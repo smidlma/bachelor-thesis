@@ -8,13 +8,12 @@ import {
   NTabPane,
   NButton,
   NDivider,
-  NPageHeader,
-  NAvatar,
   NSpace,
   NDrawer,
   NDrawerContent,
   NEmpty,
   useMessage,
+  NSkeleton,
 } from 'naive-ui'
 import SSource from '../components/SSource/SSource.vue'
 import SSourceConfig from '../components/SSourceConfig/SSourceConfig.vue'
@@ -45,7 +44,11 @@ const openConfig = (item: string) => {
 }
 const message = useMessage()
 
-onMounted(() => message.success('mounted'))
+const loading = ref(true)
+
+onMounted(() => {
+  setTimeout(() => (loading.value = false), 500)
+})
 const socket = useSocket()
 const closePipeline = (id: string) => {
   socket.sendToServer(CLOSE_PIPELINE, { id })
@@ -68,100 +71,113 @@ const updateDestination = (dest: any) => {
 </script>
 
 <template>
-  <template v-if="pipeline">
-    <SPipeline
-      :pipeline="pipeline"
-      :card="true"
-      :editor="true"
-      @close="closePipeline"
-      @run="runPipeline"
-    />
-    <NDivider></NDivider>
-    <NCard title="Sources">
-      <template #header-extra>
-        <NButton @click="openConfig('source')">Add Source</NButton>
-      </template>
-      <NTabs type="line" size="large">
-        <NTabPane
-          display-directive="if"
-          v-for="(item, index) in pipeline.sources"
-          :key="index"
-          :name="item.name"
-        >
-          <SSource :source="item" />
-        </NTabPane>
-      </NTabs>
-    </NCard>
-    <NDivider></NDivider>
-    <NCard title="Joins">
-      <template #header-extra>
-        <NButton
-          @click="openConfig('join')"
-          :disabled="
-            pipeline.sources.length === 1 ||
-            pipeline.sources.length - 1 === pipeline.joins.length
-          "
-          >Add Join</NButton
-        >
-      </template>
-      <NSpace size="large" vertical>
-        <SJoin
-          v-for="(item, index) in pipeline.joins"
-          :key="index"
-          :join="item"
-          :sources="pipeline.sources"
-          :editable="false"
-        />
-      </NSpace>
-    </NCard>
-    <NDivider></NDivider>
-    <NCard title="Destination">
-      <template #header-extra>
-        <NButton @click="openConfig('destination')">Configure</NButton>
-      </template>
-      <SDestination :destination="pipeline.destination" />
-    </NCard>
-    <!-- Drawer -->
-    <NDrawer placement="right" :width="612" v-model:show="activeDrawer">
-      <NDrawerContent>
-        <template v-if="configItem === 'source'" #header>
-          Source configuration
+  <div v-if="!loading">
+    <template v-if="pipeline">
+      <SPipeline
+        :pipeline="pipeline"
+        :card="true"
+        :editor="true"
+        @close="closePipeline"
+        @run="runPipeline"
+      />
+      <NDivider></NDivider>
+      <NCard title="Sources">
+        <template #header-extra>
+          <NButton @click="openConfig('source')">Add Source</NButton>
         </template>
-        <template v-else-if="configItem === 'destination'" #header>
-          Destination configuration
+        <NTabs type="line" size="large">
+          <NTabPane
+            display-directive="if"
+            v-for="(item, index) in pipeline.sources"
+            :key="index"
+            :name="item.name"
+          >
+            <SSource :source="item" />
+          </NTabPane>
+        </NTabs>
+      </NCard>
+      <NDivider></NDivider>
+      <NCard title="Joins">
+        <template #header-extra>
+          <NButton
+            @click="openConfig('join')"
+            :disabled="
+              pipeline.sources.length === 1 ||
+              pipeline.sources.length - 1 === pipeline.joins.length
+            "
+            >Add Join</NButton
+          >
         </template>
-        <template v-else-if="configItem === 'join'" #header>
-          Join configuration
-        </template>
-
-        <div v-if="configItem === 'source'">
-          <SSourceConfig />
-        </div>
-        <div v-else-if="configItem === 'destination'">
-          <SDestination
-            :destination="pipeline.destination"
-            :editable="true"
-            @update="updateDestination"
-          />
-        </div>
-        <div v-else-if="configItem === 'join'">
+        <NSpace size="large" vertical>
           <SJoin
+            v-for="(item, index) in pipeline.joins"
+            :key="index"
+            :join="item"
             :sources="pipeline.sources"
-            :editable="true"
-            @add="activeDrawer = false"
+            :editable="false"
           />
-        </div>
-      </NDrawerContent>
-    </NDrawer>
-    <!-- End of Drawer -->
-  </template>
-  <template v-else>
-    <NEmpty description="All pipelines are closed" style="padding-top: 48px">
-      <template #extra>
-        <NButton size="medium" @click="goToPipelines"> Show Pipelines </NButton>
-      </template>
-    </NEmpty>
-  </template>
+        </NSpace>
+      </NCard>
+      <NDivider></NDivider>
+      <NCard title="Destination">
+        <template #header-extra>
+          <NButton @click="openConfig('destination')">Configure</NButton>
+        </template>
+        <SDestination :destination="pipeline.destination" />
+      </NCard>
+      <!-- Drawer -->
+      <NDrawer placement="right" :width="612" v-model:show="activeDrawer">
+        <NDrawerContent>
+          <template v-if="configItem === 'source'" #header>
+            Source configuration
+          </template>
+          <template v-else-if="configItem === 'destination'" #header>
+            Destination configuration
+          </template>
+          <template v-else-if="configItem === 'join'" #header>
+            Join configuration
+          </template>
+
+          <div v-if="configItem === 'source'">
+            <SSourceConfig />
+          </div>
+          <div v-else-if="configItem === 'destination'">
+            <SDestination
+              :destination="pipeline.destination"
+              :editable="true"
+              @update="updateDestination"
+            />
+          </div>
+          <div v-else-if="configItem === 'join'">
+            <SJoin
+              :sources="pipeline.sources"
+              :editable="true"
+              @add="activeDrawer = false"
+            />
+          </div>
+        </NDrawerContent>
+      </NDrawer>
+      <!-- End of Drawer -->
+    </template>
+    <template v-else>
+      <NEmpty description="All pipelines are closed" style="padding-top: 48px">
+        <template #extra>
+          <NButton size="medium" @click="goToPipelines">
+            Show Pipelines
+          </NButton>
+        </template>
+      </NEmpty>
+    </template>
+  </div>
+  <div v-else>
+    <NDivider />
+    <NSpace vertical size="large">
+      <NSkeleton height="50px" />
+      <NSkeleton height="250px" />
+      <NSkeleton height="450px" />
+      <NSkeleton height="250px" />
+    </NSpace>
+  </div>
 </template>
 
 <style></style>
