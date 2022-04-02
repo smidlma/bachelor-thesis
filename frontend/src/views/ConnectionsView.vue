@@ -8,6 +8,7 @@ import {
   NButton,
   NDrawer,
   NDrawerContent,
+  useNotification,
 } from 'naive-ui'
 import { onMounted, ref } from 'vue'
 import { Connection } from '../types/Pipeline'
@@ -17,11 +18,28 @@ import { Flash } from '@vicons/ionicons5'
 
 const rest = useRest()
 const connections = ref<Array<Connection>>([])
-onMounted(async () => {
+const loadConnections = async () => {
   connections.value = await rest.getConnections()
-})
-
+}
+onMounted(async () => await loadConnections())
+const nt = useNotification()
 const activeDrawer = ref(false)
+
+const checkAndAddConnection = async (status: any) => {
+  if (status.connected) {
+    nt.success({ content: 'Connection tested and created', duration: 2000 })
+    const result = await rest.createConnection(status.connection)
+    console.log(result)
+    await loadConnections()
+    activeDrawer.value = false
+  } else {
+    nt.error({ content: 'Connection test failed', duration: 2000 })
+  }
+}
+
+const handleUpdate = (conn: any) => {
+  console.log(conn)
+}
 </script>
 <template>
   <NPageHeader :subtitle="`Number of connections: ${connections.length}`">
@@ -46,8 +64,11 @@ const activeDrawer = ref(false)
     </div>
   </NSpace>
   <NDrawer v-model:show="activeDrawer" :width="800" placement="right">
-    <NDrawerContent title="Stoner">
-      Stoner is a 1965 novel by the American writer John Williams.
+    <NDrawerContent title="Connection configuration">
+      <SConnection
+        :editable="true"
+        @connection-status="checkAndAddConnection"
+      />
     </NDrawerContent>
   </NDrawer>
 </template>

@@ -47,12 +47,17 @@ export default function () {
     return await post('pipelines', body)
   }
 
+  const createConnection = async (body: any): Promise<any> => {
+    return await post('connections', body)
+  }
+
   return {
     getFiles,
     getConnections,
     testConnection,
     getPipelines,
     createPipeline,
+    createConnection,
     API_URL,
   }
 }

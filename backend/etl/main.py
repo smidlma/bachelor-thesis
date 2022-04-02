@@ -96,8 +96,19 @@ async def getConnections():
 
 
 @app.post("/api/connections")
-async def createConnection():
-    return {"Not Implemented"}
+async def createConnection(body: ConnectionModel):
+    try:
+        connection = PostgreSQLConnection(
+            host=body.host,
+            port=body.port,
+            user=body.user,
+            password=body.password,
+            database=body.database,
+        ).save()
+        return {"created": True}
+
+    except Exception as e:
+        return {"created": False, "error": e}
 
 
 @app.post("/api/connections/test")

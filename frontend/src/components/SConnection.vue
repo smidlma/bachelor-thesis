@@ -11,6 +11,7 @@ import {
   NCard,
   NIconWrapper,
   NPageHeader,
+  NSelect,
 } from 'naive-ui'
 import { PropType, ref } from 'vue'
 import { Flash } from '@vicons/ionicons5'
@@ -79,7 +80,7 @@ const handleValidateClick = (e: MouseEvent) => {
 
 const validateConnection = async () => {
   const result = await rest.testConnection(formValue.value)
-  emit('connectionStatus', result)
+  emit('connectionStatus', { connection: formValue.value, ...result })
 }
 </script>
 
@@ -93,6 +94,13 @@ const validateConnection = async () => {
     :disabled="!editable"
     :show-require-mark="editable"
   >
+    <NFormItem label="Type">
+      <NSelect
+        :options="[{ label: 'PostgreSQL', value: 'postgresql' }]"
+        default-value="postgresql"
+        :disabled="true"
+      />
+    </NFormItem>
     <NFormItem label="Host" path="host">
       <NInput v-model:value="formValue.host" placeholder="Input host" />
     </NFormItem>
@@ -134,19 +142,10 @@ const validateConnection = async () => {
             <Flash />
           </NIcon>
         </NIconWrapper>
-        <!-- <NAvatar
-          src="https://cdnimg103.lizhi.fm/user/2017/02/04/2583325032200238082_160x160.jpg"
-        /> -->
       </template>
       <template #extra>
         <!-- <NSpace>
-          <NButton v-if="!props.editor" @click="emit('open', props.pipeline.id)"
-            >Open</NButton
-          >
-          <NSpace v-else>
-            <NButton @click="emit('run', props.pipeline.id)">Run</NButton>
-            <NButton @click="emit('close', props.pipeline.id)">Close</NButton>
-          </NSpace>
+        
         </NSpace> -->
       </template>
     </NPageHeader>
