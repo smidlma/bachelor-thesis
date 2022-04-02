@@ -47,7 +47,7 @@ interface Destination {
   destinationName: string
   targetTable: string
   connection: Connection
-  mergeType: string
+  insertOption: string
 }
 
 interface TableRow {

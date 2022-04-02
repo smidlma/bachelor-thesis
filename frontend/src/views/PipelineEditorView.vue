@@ -23,7 +23,11 @@ import SDestinationConfig from '../components/SDestinationConfig.vue'
 import SJoin from '../components/SJoin/SJoin.vue'
 import SPipeline from '../components/SPipeline/SPipeline.vue'
 import useSocket from '../use/socket'
-import { CLOSE_PIPELINE, RUN_PIPELINE } from '../utils/commands'
+import {
+  ADD_DESTINATION,
+  CLOSE_PIPELINE,
+  RUN_PIPELINE,
+} from '../utils/commands'
 import { useRouter } from 'vue-router'
 
 const store = useStore()
@@ -55,6 +59,11 @@ const runPipeline = () => {
 const router = useRouter()
 const goToPipelines = () => {
   router.push({ name: 'Pipelines' })
+}
+
+const updateDestination = (dest: any) => {
+  socket.sendToServer(ADD_DESTINATION, dest)
+  activeDrawer.value = false
 }
 </script>
 
@@ -129,7 +138,11 @@ const goToPipelines = () => {
           <SSourceConfig />
         </div>
         <div v-else-if="configItem === 'destination'">
-          <SDestinationConfig :destination="pipeline.destination" />
+          <SDestination
+            :destination="pipeline.destination"
+            :editable="true"
+            @update="updateDestination"
+          />
         </div>
         <div v-else-if="configItem === 'join'">
           <SJoin

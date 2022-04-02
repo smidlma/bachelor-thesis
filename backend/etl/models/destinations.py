@@ -50,12 +50,20 @@ class Destination(mongo.EmbeddedDocument):
         )
         return rowsAffected
 
+    def update(self, data):
+        self.destinationName = data["name"]
+        self.targetTable = data["targetTable"]
+        newCon = con.Connection.objects(id=data["connection"]).first()
+        self.connection = newCon
+        self.insertOption = data["insertOption"]
+
     def json(self):
         return {
             "id": str(self.id),
             "destinationName": self.destinationName,
             "targetTable": self.targetTable,
             "connection": self.connection.json(),
+            "insertOption": self.insertOption,
         }
 
 
@@ -76,6 +84,9 @@ class PostgreSQLDest(Destination):
             insertOption=insertOption,
             **data
         )
+
+    def update(self, data):
+        return super().update(data)
 
     def json(self):
         return super().json()

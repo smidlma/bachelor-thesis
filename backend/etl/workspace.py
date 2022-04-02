@@ -46,6 +46,7 @@ class Command(Enum):
     SOURCE_SCHEMA_MAPPING = "SOURCE_SCHEMA_MAPPING"
     SHOW_SOURCE_PREVIEW = "SHOW_SOURCE_PREVIEW"
     ADD_JOIN = "ADD_JOIN"
+    ADD_DESTINATION = "ADD_DESTINATION"
 
 
 class ConnectionManager:
@@ -130,10 +131,11 @@ class PipelineBuilder:
             tr.update(data)
             self.pipeline.save()
 
-
-class Cluster:
-    def __init__(self) -> None:
-        pass
+    def addDestination(self, data):
+        # update
+        print(data)
+        self.pipeline.destination.update(data)
+        self.pipeline.save()
 
 
 class WorkSpaceManager:
@@ -189,4 +191,7 @@ class WorkSpaceManager:
             await self.sendOpenedPipeline()
         elif msg["cmd"] == Command.ADD_TRANSFORMATION.value:
             self.builder.addTransformation(msg["data"])
+            await self.sendOpenedPipeline()
+        elif msg["cmd"] == Command.ADD_DESTINATION.value:
+            self.builder.addDestination(msg["data"])
             await self.sendOpenedPipeline()
