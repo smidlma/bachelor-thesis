@@ -1,6 +1,6 @@
-import { getCurrentInstance } from 'vue'
 import { createStore } from 'vuex'
 import { INIT_STATE } from '../utils/commands'
+
 export default createStore({
   state: {
     socket: {
@@ -26,6 +26,12 @@ export default createStore({
       const msg = { from: 'FE', to: 'BE', cmd: INIT_STATE, data: null }
       console.log(msg)
       socket.sendObj(msg)
+
+      //@ts-ignore
+      window.$notification.success({
+        content: 'Server connected',
+        duration: 3000,
+      })
     },
     // Connection closed
     SOCKET_ONCLOSE(state, event) {
@@ -33,6 +39,11 @@ export default createStore({
 
       state.socket.heartBeatTimer = 0
       console.log('The line is disconnected: ' + new Date())
+      //@ts-ignore
+      window.$notification.error({
+        content: 'Server is not connected',
+        duration: 5000,
+      })
     }, // An error occurred
     SOCKET_ONERROR(state, event) {
       console.error(state, event)
@@ -44,6 +55,27 @@ export default createStore({
         state.pipeline = message.data
       } else if (message.cmd === 'INIT') {
       } else if (message.cmd === 'RUNNING_PIPELINE') {
+        state.runningPipelines = message.data
+        if (message.data.length > 0) {
+          //@ts-ignore
+          window.$notification.info({
+            content: `Pipeline is running`,
+            duration: 5000,
+          })
+        }
+      } else if (message.cmd === 'INFO') {
+        if (message.data.success) {
+          //@ts-ignore
+          window.$notification.success({
+            content: `${message.data.message}`,
+            duration: 5000,
+          })
+        } else {
+          //@ts-ignore
+          window.$notification.error({
+            content: `Error: ${message.data.error}`,
+          })
+        }
       }
     },
     // Auto reconnect
@@ -65,7 +97,7 @@ export default createStore({
       return state.pipeline
     },
     runningPipelines(state) {
-      return -1
+      return state.runningPipelines
     },
   },
 })

@@ -65,7 +65,11 @@ class Pipeline(mongo.Document):
             # Call destination to load df to db
             rowsAffected = self.moveToDestination(transformedSource[lastTransformedId])
 
-            return {"success": True, "rowsAffected": rowsAffected}
+            return {
+                "success": True,
+                "rowsAffected": rowsAffected,
+                "message": f"Successful run with {rowsAffected} rows affected.",
+            }
         except Exception as e:
             return {"success": False, "error": str(e)}
 

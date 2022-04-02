@@ -17,27 +17,25 @@ import {
   useNotification,
   NDrawer,
   NDrawerContent,
+  useMessage,
 } from 'naive-ui'
 import { ref, h, Component, PropType, watch, onMounted } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { Analytics, FileTray, Build } from '@vicons/ionicons5'
 import { useStore } from 'vuex'
 import { computed } from '@vue/reactivity'
-import store from './store'
 import SPipelineCreate from './components/SPipelineCreate/SPipelineCreate.vue'
 import { Pipeline } from './types/Pipeline'
 import useRest from './use/rest'
+
 const rest = useRest()
 const props = defineProps({
   theme: { type: Object as PropType<GlobalTheme | null>, default: null },
 })
-
 const emit = defineEmits(['changeTheme'])
-
 const renderIcon = (icon: Component) => {
   return () => h(NIcon, null, { default: () => h(icon) })
 }
-
 const menuOptions: MenuOption[] = [
   {
     label: () =>
@@ -94,20 +92,14 @@ router.beforeEach((to) => {
 router.afterEach(() => {
   loadingBar.finish()
 })
-// const store = useStore()
-const notification = useNotification()
-const serverIsConnected = computed(() => store.getters.socketConnection)
-watch(serverIsConnected, () => showConnInfo())
 
-onMounted(() => showConnInfo())
+const store = useStore()
 
-const showConnInfo = () => {
-  if (serverIsConnected.value) {
-    notification.success({ content: 'Server connected', duration: 5000 })
-  } else {
-    notification.error({ content: 'Server is not connected', duration: 5000 })
-  }
-}
+//@ts-ignore
+window.$message = useMessage()
+
+//@ts-ignore
+window.$notification = useNotification()
 
 const activeDrawer = ref(false)
 
@@ -115,10 +107,15 @@ const createPipeline = async (data: Object) => {
   activeDrawer.value = false
   const result = await rest.createPipeline(data)
   if (result.created) {
-    notification.success({ content: 'Pipeline created', duration: 2000 })
+    //@ts-ignore
+    window.$notification.success({
+      content: 'Pipeline created',
+      duration: 2000,
+    })
     router.push({ name: 'Editor' })
   } else {
-    notification.error({
+    //@ts-ignore
+    window.$notification.error({
       content: `Not created: ${result.error}`,
       duration: 2000,
     })

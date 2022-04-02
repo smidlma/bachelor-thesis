@@ -1,4 +1,3 @@
-
 <script setup lang="ts">
 import {
   NCard,
@@ -10,10 +9,12 @@ import {
   NPageHeader,
   NAvatar,
   NButton,
+  NIconWrapper,
 } from 'naive-ui'
 import { PropType } from 'vue'
 import { Pipeline } from '../../types/Pipeline'
 import { ChevronForward } from '@vicons/ionicons5'
+import { Analytics } from '@vicons/ionicons5'
 const props = defineProps({
   pipeline: { type: Object as PropType<Pipeline>, required: true },
   isOpened: { type: Boolean, default: false },
@@ -29,9 +30,14 @@ const emit = defineEmits(['open', 'close', 'run'])
     <NPageHeader :subtitle="`Sources: ${props.pipeline.sources.length}`">
       <template #title>Pipeline: {{ props.pipeline.name }}</template>
       <template #avatar>
-        <NAvatar
+        <NIconWrapper color="rgba(99, 226, 183, 0.16)" :size="40">
+          <NIcon :size="32" color="#63e2b7">
+            <Analytics />
+          </NIcon>
+        </NIconWrapper>
+        <!-- <NAvatar
           src="https://cdnimg103.lizhi.fm/user/2017/02/04/2583325032200238082_160x160.jpg"
-        />
+        /> -->
       </template>
       <template #extra>
         <NSpace>

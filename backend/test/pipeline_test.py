@@ -47,7 +47,7 @@ def test_create_pipeline():
     ).save()
     dest = destination.PostgreSQLDest(
         destinationName="MyWareHouse",
-        targetTable="import",
+        targetTable="mock",
         connection=connection,
         insertOption="append",
     )
@@ -63,7 +63,7 @@ def test_create_pacient_pipeline():
         host="localhost", port=5432, user="smidlma", password="", database="warehouse"
     ).save()
     dest = destination.PostgreSQLDest(
-        "testDest", "import", connection=connection, insertOption="append"
+        "testDest", "hospital", connection=connection, insertOption="append"
     )
     pipeline.setDestination(dest)
     pipeline.save()

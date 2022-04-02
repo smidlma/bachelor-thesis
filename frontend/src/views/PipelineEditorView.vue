@@ -49,6 +49,7 @@ const closePipeline = (id: string) => {
 
 const runPipeline = () => {
   socket.sendToServer(RUN_PIPELINE, {})
+  // closePipeline(pipeline.value.id)
 }
 
 const router = useRouter()
