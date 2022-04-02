@@ -116,8 +116,6 @@ async def testConnecion(body: ConnectionModel):
         return {"connected": False}
 
 
-# postgresql+psycopg2://smidlma:@localhost:5432/warehouse
-# postgresql+psycopg2://smidlma:@localhost:5423/warehouse
 ########## Manage files ##########
 @app.get("/api/files")
 async def getFiles():

@@ -156,9 +156,13 @@ class WorkSpaceManager:
         if pipeline is None:
             return False
         print("task start")
+        self.running.append(pipeline.id)
+        await self.sendRunning()
         result = pipeline.run()
         await self.connectionManager.send("ASDF", result)
+        self.running.remove(pipeline.id)
         # await asyncio.sleep(10)
+        await self.sendRunning()
         print("task end")
         return result
 
