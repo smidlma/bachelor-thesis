@@ -8,13 +8,17 @@ import {
   NInput,
   NSpace,
   NInputNumber,
+  FormRules,
 } from 'naive-ui'
 import { computed, onUpdated, PropType, ref } from 'vue'
 import Field from '../../types/Field'
 
 const props = defineProps({
   columns: { type: Array as PropType<Array<Field>>, required: true },
-  transformation: { type: Object, default: { column: null, ascending: true } },
+  transformation: {
+    type: Object,
+    default: { column: null, op: 'gt', vals: [0, 0] },
+  },
   editable: { type: Boolean, default: false },
 })
 const emit = defineEmits(['save'])
@@ -26,26 +30,24 @@ const formValue = ref({
   vals: props.transformation ? props.transformation.vals : [0, 0],
 })
 
-const rules = computed(() => {
-  return {
-    column: {
-      required: true,
-      message: 'Please select column',
-      trigger: 'blur',
-    },
-    op: {
-      required: true,
-      message: 'Please select operator',
-      trigger: 'blur',
-    },
-    vals: {
-      type: 'array',
-      required: true,
-      message: 'Please select date',
-      trigger: 'blur',
-    },
-  }
-})
+const rules: FormRules = {
+  column: {
+    required: true,
+    message: 'Please select column',
+    trigger: 'blur',
+  },
+  op: {
+    required: true,
+    message: 'Please select operator',
+    trigger: 'blur',
+  },
+  vals: {
+    type: 'array',
+    required: true,
+    message: 'Please select date',
+    trigger: 'blur',
+  },
+}
 
 const handleValidateClick = (e: MouseEvent) => {
   e.preventDefault()
@@ -113,7 +115,11 @@ const handleValidateClick = (e: MouseEvent) => {
         <NInputNumber :value="props.transformation.vals[0]" :disabled="true" />
         <NInputNumber :value="props.transformation.vals[1]" :disabled="true" />
       </NSpace>
-      <NInput v-else :value="props.transformation.vals[0]" :disabled="true" />
+      <NInputNumber
+        v-else
+        :value="props.transformation.vals[0]"
+        :disabled="true"
+      />
     </NFormItem>
   </template>
 </template>

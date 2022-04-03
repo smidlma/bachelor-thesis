@@ -183,7 +183,7 @@ class PostgreSQL(Source):
             self.connection.connect()
 
         self.dfSample = pd.read_sql_query(
-            f"SELECT * FROM {self.tableName} LIMIT 1;", self.connection.con
+            f"SELECT * FROM {self.tableName} LIMIT {nrows};", self.connection.con
         )
         return self.dfSample
 
