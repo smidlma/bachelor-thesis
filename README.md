@@ -45,7 +45,7 @@ uvicorn etl.main:app
 ### Frontend Folder
 
 ```bash
-npm installl
+npm install
 ```
 
 > Run dev server
