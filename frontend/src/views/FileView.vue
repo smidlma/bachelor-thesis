@@ -40,21 +40,6 @@ onMounted(async () => {
           </NIcon>
         </NIconWrapper>
       </template>
-      <template #extra>
-        <NSpace>
-          <NUpload
-            action="https://www.mocky.io/v2/5e4bafc63100007100d8b70f"
-            :headers="{
-              'naive-info': 'hello!',
-            }"
-            :data="{
-              'naive-data': 'cool! naive!',
-            }"
-          >
-            <NButton>Upload</NButton>
-          </NUpload>
-        </NSpace>
-      </template>
     </NPageHeader>
     <NDivider></NDivider>
     <template v-if="!files.length">

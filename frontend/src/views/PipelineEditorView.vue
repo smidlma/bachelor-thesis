@@ -56,7 +56,8 @@ const closePipeline = (id: string) => {
 
 const runPipeline = () => {
   socket.sendToServer(RUN_PIPELINE, {})
-  // closePipeline(pipeline.value.id)
+  message.success('Starting pipeline')
+  // goToPipelines()
 }
 
 const router = useRouter()
@@ -113,7 +114,7 @@ const updateDestination = (dest: any) => {
             v-for="(item, index) in pipeline.joins"
             :key="index"
             :join="item"
-            :sources="pipeline.sources"
+            :sources="[...pipeline.sources, ...pipeline.joins]"
             :editable="false"
           />
         </NSpace>
@@ -150,7 +151,7 @@ const updateDestination = (dest: any) => {
           </div>
           <div v-else-if="configItem === 'join'">
             <SJoin
-              :sources="pipeline.sources"
+              :sources="[...pipeline.sources, ...pipeline.joins]"
               :editable="true"
               @add="activeDrawer = false"
             />
@@ -172,10 +173,10 @@ const updateDestination = (dest: any) => {
   <div v-else>
     <NDivider />
     <NSpace vertical size="large">
-      <NSkeleton height="50px" />
-      <NSkeleton height="250px" />
-      <NSkeleton height="450px" />
-      <NSkeleton height="250px" />
+      <NSkeleton :sharp="false" height="50px" />
+      <NSkeleton :sharp="false" height="250px" />
+      <NSkeleton :sharp="false" height="450px" />
+      <NSkeleton :sharp="false" height="250px" />
     </NSpace>
   </div>
 </template>

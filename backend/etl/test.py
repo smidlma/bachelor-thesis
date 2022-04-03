@@ -75,13 +75,14 @@ def main():
     #     index_col=0,
     # )
 
-    # df_admisionDiagnoses = pd.read_csv(
-    #     "file-storage/AdmissionsDiagnosesCorePopulatedTable.txt",
-    #     sep="\t",
-    #     engine="python",
-    #     index_col=0,
-    # )
-
+    df_admisionDiagnoses = pd.read_csv(
+        "file-storage/AdmissionsDiagnosesCorePopulatedTable.txt",
+        sep="\t",
+        engine="python",
+        index_col=0,
+    )
+    print("JOIN")
+    print(dfTest.join(df_admisionDiagnoses, on="PatientID", how="inner"))
     # print(df2.dtypes)
     # print(df_admisionDiagnoses.dtypes)
     # print(df_admisionDiagnoses.join(df2, on=["AdmissionID", "AdmissionID"]).head())

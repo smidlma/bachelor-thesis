@@ -84,8 +84,15 @@ async def createPipeline(body: PipelineModel):
         return {"created": False, "error": e}
 
 
-async def runPipeline():
-    pass
+# End point for automatic run
+@app.get("/api/pipelines/run/{id}")
+def runPipeline(id):
+    try:
+        p = Pipeline.objects(id=id).first()
+        result = p.run()
+        return result
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 
 ########## Manage connections ##########

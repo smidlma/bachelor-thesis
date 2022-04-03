@@ -66,6 +66,7 @@ class Source(mongo.EmbeddedDocument):
         for tr in self.transformations:
             dfTemp = tr.transform(dfTemp)
 
+        print(dfTemp)
         return dfTemp
 
     def runTestTransformation(self, to=-1):

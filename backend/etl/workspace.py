@@ -100,8 +100,15 @@ class PipelineBuilder:
         how = data["how"]
         s1 = next(filter(lambda x: str(x.id) == s1ID, self.pipeline.sources), None)
         s2 = next(filter(lambda x: str(x.id) == s2ID, self.pipeline.sources), None)
+
+        if s1 is None:
+            s1 = next(filter(lambda x: str(x.id) == s1ID, self.pipeline.joins), None)
+        if s2 is None:
+            s2 = next(filter(lambda x: str(x.id) == s2ID, self.pipeline.joins), None)
+
         if data["id"] is None:
-            join = Join(s1=s1, s2=s2, how=how)
+            name = f"Join({s1.name} {how} {s2.name})"
+            join = Join(name=name, s1=s1, s2=s2, how=how)
             self.pipeline.addJoin(join)
             self.pipeline.save()
         else:
@@ -161,6 +168,9 @@ class WorkSpaceManager:
         self.running.append(str(pipeline.id))
         await self.sendRunning()
         result = pipeline.run()
+        # asyncio.sleep(10
+        # asyncio.get_event_loop().run_in_executor(r)
+        # result = asyncio.run_coroutine_threadsafe(pipeline.run())
         await self.connectionManager.send("INFO", result)
         self.running.remove(str(pipeline.id))
         # await asyncio.sleep(10)
