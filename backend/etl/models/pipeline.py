@@ -8,10 +8,12 @@ import etl.models.destinations as dest
 import logging as log
 import mongoengine as mongo
 
-# Pipeline class for holding and updating state of the pipeline
-
 
 class Pipeline(mongo.Document):
+    """
+    Pipeline class for holding, updating and processing state of the pipeline
+    """
+
     name = mongo.StringField()
     sources = mongo.EmbeddedDocumentListField(source.Source)
     destination = mongo.EmbeddedDocumentField(dest.Destination)

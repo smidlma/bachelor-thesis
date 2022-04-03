@@ -6,17 +6,22 @@ import pandas as pd
 import mongoengine as mongo
 from bson import ObjectId
 
-##
-
 
 class InsertOption(Enum):
+    """
+    Insert Type options when moving data to destination
+    """
+
     APPEND = "append"
     REPLACE = "replace"
     FAIL = "fail"
 
 
-# Destination base class for general functionality
 class Destination(mongo.EmbeddedDocument):
+    """
+    Destination base class for general functionality
+    """
+
     id = mongo.ObjectIdField(default=ObjectId)
     destinationName = mongo.StringField()
     targetTable = mongo.StringField()
@@ -67,8 +72,11 @@ class Destination(mongo.EmbeddedDocument):
         }
 
 
-# PostgreSQL destination class
 class PostgreSQLDest(Destination):
+    """
+    PostgreSQLDest class sepcific for postgres
+    """
+
     def __init__(
         self,
         destinationName: str,

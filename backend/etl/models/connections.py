@@ -4,8 +4,11 @@ import logging as log
 import mongoengine as mongo
 
 
-# Connection base class for general connection functionality
 class Connection(mongo.Document):
+    """
+    Connection base class for general connection functionality
+    """
+
     host = mongo.StringField()
     port = mongo.IntField()
     user = mongo.StringField()
@@ -52,6 +55,10 @@ class Connection(mongo.Document):
 
 
 class PostgreSQLConnection(Connection):
+    """
+    PostgreSQL connection class to connecto postgresql source or destination
+    """
+
     def __init__(
         self, host: str, port: int, user: str, password: str, database: str, **data
     ) -> None:

@@ -12,6 +12,9 @@ from bson import ObjectId
 
 
 def convertToPandasTypes(type: str):
+    """
+    Util func to convert datatypes to padnas datatypes
+    """
     if type == "integer":
         return "int64"
     elif type == "number":
@@ -26,8 +29,11 @@ def convertToPandasTypes(type: str):
         return "datetime64[ns]"
 
 
-# Source base class with general functionality
 class Source(mongo.EmbeddedDocument):
+    """
+    Source base class with general functionality
+    """
+
     id = mongo.ObjectIdField(default=ObjectId)
     name = mongo.StringField()
     transformations = mongo.EmbeddedDocumentListField(tr.Transformation)
@@ -101,8 +107,12 @@ class Source(mongo.EmbeddedDocument):
         }
 
 
-# CSV source class
+#
 class CSV(Source):
+    """
+    Class for CSV files
+    """
+
     fileName = mongo.StringField()
     filePath = mongo.StringField()
     separator = mongo.StringField(default="\t")
@@ -161,8 +171,11 @@ class CSV(Source):
         return res
 
 
-# PostgreSQL class, tableName must be lowerCase
 class PostgreSQL(Source):
+    """
+    PostgreSQL class handles postgres as a source
+    """
+
     tableName = mongo.StringField()
     connection = mongo.ReferenceField(con.Connection)
 
@@ -190,8 +203,14 @@ class PostgreSQL(Source):
     def extract(self) -> pd.DataFrame:
         if not self.testConnection():
             self.connection.connect()
+
+        fields = self.mappedSchema["fields"]
+        cols = list(map(lambda x: x["name"], fields))
+        types = {f["name"]: convertToPandasTypes(f["type"]) for f in fields}
+
         return pd.read_sql_query(
-            f"SELECT * FROM {self.tableName};", self.connection.con
+            f"SELECT * FROM {self.tableName};",
+            self.connection.con,
         )
 
     def json(self):
@@ -201,8 +220,12 @@ class PostgreSQL(Source):
         return res
 
 
-# JOIN AS A SOURCE
 class Join(Source):
+    """
+    Join class its part of the Source family,
+    to enable functionality as a source due to joining other sources
+    """
+
     s1 = mongo.EmbeddedDocumentField("Source")
     s2 = mongo.EmbeddedDocumentField("Source")
     how = mongo.StringField()

@@ -6,6 +6,10 @@ from bson import ObjectId
 
 
 class Transformation(mongo.EmbeddedDocument):
+    """
+    Base class for all transformations with general functionality
+    """
+
     id = mongo.ObjectIdField(default=ObjectId)
     name = mongo.StringField()
     position = mongo.IntField()
@@ -26,6 +30,10 @@ class Transformation(mongo.EmbeddedDocument):
 
 
 class Sort(Transformation):
+    """
+    Sort class sorts dataframe
+    """
+
     column = mongo.StringField()
     ascending = mongo.BooleanField(default=True)
 
@@ -49,8 +57,11 @@ class Sort(Transformation):
         return res
 
 
-# Mask single column
 class MaskColumn(Transformation):
+    """
+    MaskColumn class masks column in dataframe
+    """
+
     column = mongo.StringField()
 
     def __init__(self, *args, **values):
@@ -71,8 +82,11 @@ class MaskColumn(Transformation):
         return res
 
 
-# Date filter {ColName: asdf, op: gt| ls| between, datetime: ....}
 class DateFilter(Transformation):
+    """
+    Date filter {column: birth, op: gt| ls| between, datetimes: [....]} filter dates columns
+    """
+
     column = mongo.StringField()
     op = mongo.StringField()
     datetimes = mongo.ListField()
@@ -112,6 +126,10 @@ class DateFilter(Transformation):
 
 
 class ValueFilter(Transformation):
+    """
+    Value filter filter numeric columns
+    """
+
     column = mongo.StringField()
     op = mongo.StringField()
     vals = mongo.ListField()
