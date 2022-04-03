@@ -15,6 +15,8 @@ import useSocket from '../../use/socket'
 import { ADD_SOURCE } from '../../utils/commands'
 import { Add } from '@vicons/ionicons5'
 import SConnection from '../SConnection.vue'
+import SCSV from './SCSV.vue'
+import SPostgreSQL from './SPostgreSQL.vue'
 const props = defineProps({
   source: { type: Object as PropType<Source>, default: null },
 })
@@ -25,22 +27,13 @@ const connections: any = ref([])
 const isTested = ref(false)
 
 onMounted(async () => {
-  const d = await rest.getFiles()
-  files.value = d.map((x) => {
-    return { label: x.fileName, value: x.fileName }
-  })
+  files.value = await rest.getFiles()
 
-  const c = await rest.getConnections()
-  connections.value = c.map((x) => {
-    return { label: x.database, value: x.id }
-  })
+  connections.value = await rest.getConnections()
 })
-const formCSV = ref({
-  name: '',
-  fileName: null,
-})
-const addSource = (type: string) => {
-  socket.sendToServer(ADD_SOURCE, { sourceType: type, ...formCSV.value })
+
+const addSource = (data: Object) => {
+  socket.sendToServer(ADD_SOURCE, data)
 }
 </script>
 
@@ -50,33 +43,11 @@ const addSource = (type: string) => {
     <NTabs type="segment">
       <NTabPane name="csv" tab="CSV">
         <NDivider></NDivider>
-        <NSpace vertical size="large">
-          <NInput
-            v-model:value="formCSV.name"
-            placeholder="Name of the source"
-          ></NInput>
-          <NSelect
-            placeholder="Select the file"
-            :options="files"
-            v-model:value="formCSV.fileName"
-          ></NSelect>
-          <NButton @click="addSource('csv')">Add</NButton>
-        </NSpace>
+        <SCSV :files="files" @add="addSource" />
       </NTabPane>
       <NTabPane name="postgresql" tab="PostgreSQL">
         <NDivider></NDivider>
-        <NSpace vertical size="large">
-          <NInput placeholder="Name of the source"></NInput>
-          <NSelect
-            :options="connections"
-            placeholder="Select from defined connections"
-          >
-          </NSelect>
-          <NInput placeholder="Table name to extract from"></NInput>
-          <NSpace>
-            <NButton>Add</NButton>
-          </NSpace>
-        </NSpace>
+        <SPostgreSQL :connectios="connections" @add="addSource" />
       </NTabPane>
     </NTabs>
   </template>

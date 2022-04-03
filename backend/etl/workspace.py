@@ -2,8 +2,9 @@ import asyncio
 from enum import Enum
 from typing import List
 from fastapi import WebSocket
+from etl.models.connections import Connection
 from etl.models.pipeline import Pipeline
-from etl.models.sources import CSV, Join
+from etl.models.sources import CSV, Join, PostgreSQL
 from etl.models.transformations import DateFilter, MaskColumn, Sort, ValueFilter
 
 
@@ -93,6 +94,11 @@ class PipelineBuilder:
             s = CSV(name=data["name"], fileName=data["fileName"])
             self.pipeline.addSource(s)
             self.pipeline.save()
+        elif data["sourceType"] == "postgresql":
+            c = Connection.objects(id=data["connection"]).first()
+            s = PostgreSQL(name=data["name"], tableName=data["tableName"], connection=c)
+            self.pipeline.addSource(s)
+            self.pipeline.save()
 
     def addJoin(self, data):
         s1ID = data["s1"]
@@ -168,9 +174,6 @@ class WorkSpaceManager:
         self.running.append(str(pipeline.id))
         await self.sendRunning()
         result = pipeline.run()
-        # asyncio.sleep(10
-        # asyncio.get_event_loop().run_in_executor(r)
-        # result = asyncio.run_coroutine_threadsafe(pipeline.run())
         await self.connectionManager.send("INFO", result)
         self.running.remove(str(pipeline.id))
         # await asyncio.sleep(10)
