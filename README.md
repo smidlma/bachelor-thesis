@@ -14,7 +14,7 @@ Etl tool to process csv files and other formats of data with ability to connect 
 - MongoDB LTS
 - PostgresSQL - optional or use any postgresql connection
 
-## Installation
+## Run project
 
 Instalation steps for backend and frontend
 
@@ -36,7 +36,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-> Run server (mongo should be runnign !)
+> Run server (mongo server has to be runnign on localhost!)
 
 ```bash
 uvicorn etl.main:app
