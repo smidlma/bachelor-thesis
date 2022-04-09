@@ -10,7 +10,7 @@ Etl tool to process csv files and other formats of data with ability to connect 
 ## Requirements
 
 - Node>=16.14.2LTS
-- Python3
+- Python>=3.9
 - MongoDB>=3.6
 - PostgresSQL - optional or use any postgresql connection
 
