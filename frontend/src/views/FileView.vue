@@ -67,25 +67,27 @@ onMounted(async () => {
     </template>
     <NDivider />
 
-    <n-upload
+    <NUpload
       :action="`${rest.API_URL}/files/upload`"
       style="text-align: center"
+      accept=".csv,.txt"
+      :input-props="{ accept: '.csv' }"
     >
-      <n-upload-dragger>
+      <NUploadDragger>
         <div style="margin-bottom: 12px">
-          <n-icon size="48" :depth="3">
+          <NIcon size="48" :depth="3">
             <Archive />
-          </n-icon>
+          </NIcon>
         </div>
-        <n-text style="font-size: 16px">
+        <NText style="font-size: 16px">
           Click or drag a file to this area to upload
-        </n-text>
-        <n-p depth="3" style="margin: 8px 0 0 0">
+        </NText>
+        <NP depth="3" style="margin: 8px 0 0 0">
           Strictly prohibit from uploading sensitive information. For example,
           your bank card PIN or your credit card expiry date.
-        </n-p>
-      </n-upload-dragger>
-    </n-upload>
+        </NP>
+      </NUploadDragger>
+    </NUpload>
   </div>
 </template>
 

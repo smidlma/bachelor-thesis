@@ -12,7 +12,7 @@ manager = WorkSpaceManager()
 
 
 @router.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket, client_id=0):
+async def websocket_endpoint(websocket: WebSocket):
     await manager.connectionManager.connect(websocket)
     try:
         while True:

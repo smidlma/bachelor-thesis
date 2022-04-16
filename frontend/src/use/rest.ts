@@ -51,7 +51,14 @@ export default function () {
     return await post('connections', body)
   }
 
+  const runPipeline = async (id: string) => {
+    const resp = await fetch(`${API_URL}/pipelines/run/${id}}`)
+    const data = await resp.json()
+    return data
+  }
+
   return {
+    runPipeline,
     getFiles,
     getConnections,
     testConnection,

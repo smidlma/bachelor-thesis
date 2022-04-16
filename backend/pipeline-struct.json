@@ -1,34 +1,21 @@
 {
-    "name": "Pipeline",
-    "sources": [
-        {
-            "name": "Sample Source CSV",
-            "type": "CSV",
-            "filePath": "/file.csv",
-            "defaultSchema": {},
-            "transformations": [
-                {}
-            ]
-        },
-        {
-            "name": "Sample Source POSTGRES",
-            "type": " POSTGRESQL",
-            "connection": {
-                "host": "address",
-                "port": 5522,
-                "user": "User",
-                "password": "password"
-            },
-            "defaultSchema": {},
-            "transformations": [
-                {}
-            ]
-        }
-    ],
-    "joiner": [],
-    "destination": {
-        "name": "Sample Destination",
-        "targetTable": "Table",
-        "connection": {}
+  "name": "Hospital",
+  "sources": [
+    {
+      "name": "Pacients",
+      "transformations": [],
+      "mappedSchema": {},
+      "defaultSchema": {},
+      "fileName": "PatientCorePopulatedTable.txt",
+      "filePath": "file-storage/PatientCorePopulatedTable.txt",
+      "separator": "\t"
     }
+  ],
+  "destination": {
+    "destinationName": "Warehouse",
+    "targetTable": "hospital",
+    "connection": {},
+    "insertOption": "replace"
+  },
+  "joins": []
 }

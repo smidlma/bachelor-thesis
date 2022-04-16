@@ -27,7 +27,9 @@ const emit = defineEmits(['open', 'close', 'run'])
 
 <template>
   <NCard v-if="props.card">
-    <NPageHeader :subtitle="`Sources: ${props.pipeline.sources.length}`">
+    <NPageHeader
+      :subtitle="`Sources: ${props.pipeline.sources.length} -> Destination: ${props.pipeline.destination.destinationName}`"
+    >
       <template #title>Pipeline: {{ props.pipeline.name }}</template>
       <template #avatar>
         <NIconWrapper color="rgba(99, 226, 183, 0.16)" :size="40">

@@ -1,5 +1,6 @@
 from asyncio import sleep
 import os
+import time
 from typing import Optional
 from fastapi import FastAPI, Request, UploadFile, WebSocket
 from fastapi.responses import HTMLResponse
@@ -87,12 +88,14 @@ async def createPipeline(body: PipelineModel):
 # End point for automatic run
 @app.get("/api/pipelines/run/{id}")
 def runPipeline(id):
-    try:
-        p = Pipeline.objects(id=id).first()
-        result = p.run()
-        return result
-    except Exception as e:
-        return {"success": False, "error": str(e)}
+    time.sleep(5)
+    return {"success": True, "message": f"Pipeline {id}, completed successfuly"}
+    # try:
+    #     p = Pipeline.objects(id=id).first()
+    #     result = p.run()
+    #     return result
+    # except Exception as e:
+    #     return {"success": False, "error": str(e)}
 
 
 ########## Manage connections ##########

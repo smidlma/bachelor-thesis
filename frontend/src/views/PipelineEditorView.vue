@@ -12,28 +12,22 @@ import {
   NDrawer,
   NDrawerContent,
   NEmpty,
-  useMessage,
   NSkeleton,
+  useNotification,
 } from 'naive-ui'
 import SSource from '../components/SSource/SSource.vue'
 import SSourceConfig from '../components/SSourceConfig/SSourceConfig.vue'
 import SDestination from '../components/SDestination/SDestination.vue'
-import SDestinationConfig from '../components/SDestinationConfig.vue'
 import SJoin from '../components/SJoin/SJoin.vue'
 import SPipeline from '../components/SPipeline/SPipeline.vue'
 import useSocket from '../use/socket'
-import {
-  ADD_DESTINATION,
-  CLOSE_PIPELINE,
-  RUN_PIPELINE,
-} from '../utils/commands'
+import { ADD_DESTINATION, CLOSE_PIPELINE } from '../utils/commands'
 import { useRouter } from 'vue-router'
+import useRest from '../use/rest'
 
 const store = useStore()
-
+const rest = useRest()
 const pipeline = computed(() => store.getters.currentPipeline)
-
-// const sources = computed(() => log)
 
 const activeDrawer: Ref<boolean> = ref(false)
 const configItem: Ref<string> = ref('source')
@@ -42,8 +36,7 @@ const openConfig = (item: string) => {
   configItem.value = item
   activeDrawer.value = true
 }
-const message = useMessage()
-
+const notification = useNotification()
 const loading = ref(true)
 
 onMounted(() => {
@@ -54,10 +47,21 @@ const closePipeline = (id: string) => {
   socket.sendToServer(CLOSE_PIPELINE, { id })
 }
 
-const runPipeline = () => {
-  socket.sendToServer(RUN_PIPELINE, {})
-  message.success('Starting pipeline')
-  // goToPipelines()
+const runPipeline = async (id: string) => {
+  // socket.sendToServer(RUN_PIPELINE, {})
+  goToPipelines()
+  notification.success({ content: 'Starting pipeline', duration: 2000 })
+  const res = await rest.runPipeline(id)
+  if (res.success) {
+    notification.success({
+      content: `${res.message}`,
+      duration: 5000,
+    })
+  } else {
+    notification.error({
+      content: `Error: ${res.error}`,
+    })
+  }
 }
 
 const router = useRouter()
@@ -79,7 +83,7 @@ const updateDestination = (dest: any) => {
         :card="true"
         :editor="true"
         @close="closePipeline"
-        @run="runPipeline"
+        @run="runPipeline(pipeline.id)"
       />
       <NDivider></NDivider>
       <NCard title="Sources">

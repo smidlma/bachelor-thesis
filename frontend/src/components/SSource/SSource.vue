@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { h, PropType, Ref, ref, watch } from 'vue'
+import { h, PropType, Ref, ref } from 'vue'
 import { Source } from '../../types/Pipeline'
 import SSourceMapper from '../SSourceMapper/SSourceMapper.vue'
 import SSourcePreview from '../SSourcePreview/SSourcePreview.vue'
@@ -9,10 +9,7 @@ import {
   NDrawer,
   NDrawerContent,
   NText,
-  NH1,
   NH2,
-  NCollapseTransition,
-  NSwitch,
   NCollapse,
   NCollapseItem,
   NIcon,
