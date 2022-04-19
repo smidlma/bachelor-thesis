@@ -1,11 +1,12 @@
 import asyncio
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from etl.config import MONGO_CON_STR
 from etl.workspace import WorkSpaceManager
 import logging as log
 import mongoengine as mongo
 
-mongo.connect("mongotest")
+mongo.connect(host=MONGO_CON_STR)
 
 router = APIRouter()
 manager = WorkSpaceManager()

@@ -33,9 +33,7 @@ class PipelineModel(BaseModel):
 
 
 app = FastAPI()
-origins = [
-    "http://localhost:3000",
-]
+origins = config.ALLOW_ORIGINS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -44,7 +42,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-mongo.connect("mongotest")
+mongo.connect(host=config.MONGO_CON_STR)
 log.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s (%(filename)s:%(lineno)s)",
     level=log.NOTSET,
