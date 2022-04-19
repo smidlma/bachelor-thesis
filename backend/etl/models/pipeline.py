@@ -1,6 +1,4 @@
-import asyncio
-from time import sleep
-
+from typing import List
 from pandas import DataFrame
 import etl.models.transformations as tr
 import etl.models.sources as source
@@ -22,8 +20,8 @@ class Pipeline(mongo.Document):
     def __init__(
         self,
         name,
-        sources: list[source.Source] = [],
-        joins: list[source.Join] = [],
+        sources: List[source.Source] = [],
+        joins: List[source.Join] = [],
         destination=None,
         **data,
     ) -> None:
