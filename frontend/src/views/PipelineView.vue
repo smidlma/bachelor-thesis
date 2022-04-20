@@ -31,6 +31,8 @@ const openedId = computed(() => {
   return null
 })
 
+const runningPipelines = computed(() => store.getters.runningPipelines)
+
 const openPipeline = (id: string) => {
   socket.sendToServer(OPEN_PIPELINE, { id })
   router.push({ name: 'Editor' })
@@ -59,6 +61,7 @@ onMounted(async () => {
       <SPipeline
         :pipeline="item"
         :is-opened="item.id === openedId"
+        :is-running="runningPipelines.includes(item.id)"
         @open="openPipeline"
         :card="true"
       />

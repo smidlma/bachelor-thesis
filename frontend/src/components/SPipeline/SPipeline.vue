@@ -10,6 +10,7 @@ import {
   NAvatar,
   NButton,
   NIconWrapper,
+  NSpin,
 } from 'naive-ui'
 import { PropType } from 'vue'
 import { Pipeline } from '../../types/Pipeline'
@@ -20,13 +21,14 @@ const props = defineProps({
   isOpened: { type: Boolean, default: false },
   card: { type: Boolean, default: false },
   editor: { type: Boolean, default: false },
+  isRunning: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['open', 'close', 'run'])
 </script>
 
 <template>
-  <NCard v-if="props.card">
+  <NCard v-if="props.card" color="red">
     <NPageHeader
       :subtitle="`Sources: ${props.pipeline.sources.length} -> Destination: ${props.pipeline.destination.destinationName}`"
     >
@@ -41,11 +43,18 @@ const emit = defineEmits(['open', 'close', 'run'])
           src="https://cdnimg103.lizhi.fm/user/2017/02/04/2583325032200238082_160x160.jpg"
         /> -->
       </template>
+
       <template #extra>
         <NSpace>
-          <NButton v-if="!props.editor" @click="emit('open', props.pipeline.id)"
-            >Open</NButton
-          >
+          <div v-if="!props.editor">
+            <NButton
+              v-if="!props.isRunning"
+              @click="emit('open', props.pipeline.id)"
+              >Open</NButton
+            >
+            <NSpin v-else size="small" description="Running..." />
+          </div>
+
           <NSpace v-else>
             <NButton @click="emit('run', props.pipeline.id)">Run</NButton>
             <NButton @click="emit('close', props.pipeline.id)">Close</NButton>
@@ -53,6 +62,7 @@ const emit = defineEmits(['open', 'close', 'run'])
         </NSpace>
       </template>
     </NPageHeader>
+    <template #header-extra> #header-extra </template>
   </NCard>
 </template>
 <style></style>

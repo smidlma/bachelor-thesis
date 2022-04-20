@@ -49,6 +49,7 @@ const closePipeline = (id: string) => {
 
 const runPipeline = async (id: string) => {
   // socket.sendToServer(RUN_PIPELINE, {})
+  store.commit('addRunningPipeline', id)
   goToPipelines()
   notification.success({ content: 'Starting pipeline', duration: 2000 })
   const res = await rest.runPipeline(id)
@@ -62,6 +63,7 @@ const runPipeline = async (id: string) => {
       content: `Error: ${res.error}`,
     })
   }
+  store.commit('removeRunningPipeline', id)
 }
 
 const router = useRouter()

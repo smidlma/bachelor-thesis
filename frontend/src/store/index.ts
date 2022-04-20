@@ -18,6 +18,13 @@ export default createStore({
     issues: [],
   },
   mutations: {
+    addRunningPipeline(state, id: string) {
+      state.runningPipelines.push(id)
+    },
+    removeRunningPipeline(state, id: string) {
+      const index = state.runningPipelines.indexOf(id)
+      state.runningPipelines.splice(index, 1)
+    },
     // Connection open
     SOCKET_ONOPEN(state, event) {
       state.socket.isConnected = true
@@ -87,6 +94,7 @@ export default createStore({
       state.socket.reconnectError = true
     },
   },
+
   actions: {},
   modules: {},
   getters: {
