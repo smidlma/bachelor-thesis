@@ -19,9 +19,11 @@ export default createStore({
   },
   mutations: {
     addRunningPipeline(state, id: string) {
+      //@ts-ignore
       state.runningPipelines.push(id)
     },
     removeRunningPipeline(state, id: string) {
+      //@ts-ignore
       const index = state.runningPipelines.indexOf(id)
       state.runningPipelines.splice(index, 1)
     },
