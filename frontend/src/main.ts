@@ -8,11 +8,12 @@ import VueNativeSock from 'vue-native-websocket-vue3'
 import 'vfonts/Lato.css'
 // Monospace Font
 import 'vfonts/FiraCode.css'
+import { HOST, PORT } from './config'
 
 const app = createApp(App)
 app.use(router)
 app.use(store)
-app.use(VueNativeSock, 'ws://localhost:8000/ws', {
+app.use(VueNativeSock, `ws://${HOST}:${PORT}/ws`, {
   store: store,
   format: 'json',
   reconnection: true,

@@ -1,8 +1,8 @@
+import { HOST, PORT } from '../config'
 import { Pipeline } from '../types/Pipeline'
 
 export default function () {
-  const PORT = 8000
-  const API_URL = `http://localhost:${PORT}/api`
+  const API_URL = `http://${HOST}:${PORT}/api`
 
   const getAll = async (endpoint: string): Promise<Array<any>> => {
     try {
