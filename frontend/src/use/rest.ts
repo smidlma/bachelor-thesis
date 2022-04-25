@@ -52,7 +52,7 @@ export default function () {
   }
 
   const runPipeline = async (id: string) => {
-    const resp = await fetch(`${API_URL}/pipelines/run/${id}}`)
+    const resp = await fetch(`${API_URL}/pipelines/run/${id}`)
     const data = await resp.json()
     return data
   }
