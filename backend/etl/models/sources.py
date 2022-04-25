@@ -1,3 +1,4 @@
+import csv
 from email.policy import default
 import json
 from os.path import exists
@@ -122,6 +123,12 @@ class CSV(Source):
             data["filePath"] = f"{config.FILE_STORAGE_PATH}{fileName}"
         super(CSV, self).__init__(name=name, fileName=fileName, **data)
 
+        f = open(self.filePath)
+        self.separator = (
+            csv.Sniffer().sniff(f.readline(), [",", ";", "\t", " ", "|"]).delimiter
+        )
+        f.close()
+
     def testConnection(self) -> bool:
         return exists(self.filePath)
 
@@ -155,6 +162,7 @@ class CSV(Source):
         types = {f["name"]: convertToPandasTypes(f["type"]) for f in fields}
         log.info(cols)
         log.info(types)
+
         df = pd.read_csv(
             self.filePath,
             sep=self.separator,
@@ -162,7 +170,8 @@ class CSV(Source):
             index_col=0,
             dtype=types,
             usecols=cols,
-        )
+        ).drop_duplicates()
+        log.info(df.shape)
         return df
 
     def json(self):

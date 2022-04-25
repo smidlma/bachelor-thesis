@@ -86,14 +86,15 @@ async def createPipeline(body: PipelineModel):
 # End point for automatic run
 @app.get("/api/pipelines/run/{id}")
 def runPipeline(id):
-    time.sleep(5)
-    return {"success": True, "message": f"Pipeline {id}, completed successfuly"}
-    # try:
-    #     p = Pipeline.objects(id=id).first()
-    #     result = p.run()
-    #     return result
-    # except Exception as e:
-    #     return {"success": False, "error": str(e)}
+    # time.sleep(5)
+    # return {"success": True, "message": f"Pipeline {id}, completed successfuly"}
+    try:
+        log.info(f"Pipeline: {id}")
+        p = Pipeline.objects(id=id).first()
+        result = p.run()
+        return result
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 
 ########## Manage connections ##########
@@ -151,7 +152,7 @@ async def getFiles():
         for file_name in list_of_files
     ]
     for fileName, fileSize in files_with_size:
-        f = open(f"{dir_name}/{fileName}", "r")
+        f = open(f"{dir_name}/{fileName}", "r", errors="ignore")
         lines = [f.readline() for i in range(20)]
         f.close()
         files.append({"fileName": fileName, "fileSize": fileSize, "filePreview": lines})

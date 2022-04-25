@@ -36,12 +36,12 @@ class Connection(mongo.Document):
     def close(self):
         if self.con is not None:
             self.con.close()
+            self.con = None
 
     def isConnected(self) -> bool:
         if self.con is None:
             return False
-        else:
-            return True
+        return True
 
     def json(self):
         return {
@@ -71,13 +71,18 @@ class PostgreSQLConnection(Connection):
             **data,
         )
 
+    def isConnected(self) -> bool:
+        return super().isConnected()
+
     def connect(self) -> bool:
         connection_string = f"postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
         print(connection_string)
         log.debug(connection_string)
-        engine = create_engine(connection_string)
         try:
+            engine = create_engine(connection_string)
+            log.info("Try to connect")
             self.con = engine.connect()
+            log.info("connected")
             return True
         except Exception as e:
             self.con = None

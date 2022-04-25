@@ -1,3 +1,4 @@
+import time
 from typing import List
 from pandas import DataFrame
 import etl.models.transformations as tr
@@ -47,6 +48,7 @@ class Pipeline(mongo.Document):
 
     def run(self):
         try:
+            startTime = time.time()
             transformedSource = dict()
             # Run local trans of sources and save to dict
             lastTransformedId = None
@@ -63,12 +65,14 @@ class Pipeline(mongo.Document):
                 log.info(transformedSource[join.id])
 
             # Call destination to load df to db
+            log.info("Calling load to dest")
             rowsAffected = self.moveToDestination(transformedSource[lastTransformedId])
-
+            endTime = time.time()
+            totalSecRun = "{:.2f}".format(endTime - startTime)
             return {
                 "success": True,
                 "rowsAffected": rowsAffected,
-                "message": f"Successful run with {rowsAffected} rows affected.",
+                "message": f"Successful run of pipeline: {self.name}. \nETL time: {totalSecRun}sec.\n{rowsAffected} rows affected.\nTotal rows: {transformedSource[lastTransformedId].shape[0]}",
             }
         except Exception as e:
             return {"success": False, "error": str(e)}

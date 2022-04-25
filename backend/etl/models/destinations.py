@@ -5,6 +5,7 @@ import etl.models.connections as con
 import pandas as pd
 import mongoengine as mongo
 from bson import ObjectId
+import logging as log
 
 
 class InsertOption(Enum):
@@ -49,10 +50,12 @@ class Destination(mongo.EmbeddedDocument):
     def load(self, df: DataFrame):
         if not self.connection.isConnected():
             self.connection.connect()
-
+        log.info("Before load")
         rowsAffected = df.to_sql(
             self.targetTable, self.connection.con, if_exists=self.insertOption
         )
+        log.info("After log")
+        self.connection.close()
         return rowsAffected
 
     def update(self, data):
