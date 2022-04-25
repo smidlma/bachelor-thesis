@@ -39,9 +39,6 @@ const emit = defineEmits(['open', 'close', 'run'])
             <Analytics />
           </NIcon>
         </NIconWrapper>
-        <!-- <NAvatar
-          src="https://cdnimg103.lizhi.fm/user/2017/02/04/2583325032200238082_160x160.jpg"
-        /> -->
       </template>
 
       <template #extra>
@@ -56,7 +53,11 @@ const emit = defineEmits(['open', 'close', 'run'])
           </div>
 
           <NSpace v-else>
-            <NButton @click="emit('run', props.pipeline.id)">Run</NButton>
+            <NButton
+              :disabled="!props.pipeline.sources.length > 0"
+              @click="emit('run', props.pipeline.id)"
+              >Run</NButton
+            >
             <NButton @click="emit('close', props.pipeline.id)">Close</NButton>
           </NSpace>
         </NSpace>

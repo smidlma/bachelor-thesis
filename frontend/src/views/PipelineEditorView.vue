@@ -50,13 +50,14 @@ const closePipeline = (id: string) => {
 const runPipeline = async (id: string) => {
   // socket.sendToServer(RUN_PIPELINE, {})
   store.commit('addRunningPipeline', id)
+  closePipeline(id)
   goToPipelines()
+
   notification.success({ content: 'Starting pipeline', duration: 2000 })
   const res = await rest.runPipeline(id)
   if (res.success) {
     notification.success({
       content: `${res.message}`,
-      duration: 5000,
     })
   } else {
     notification.error({
