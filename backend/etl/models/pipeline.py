@@ -69,11 +69,11 @@ class Pipeline(mongo.Document):
             log.info("Calling load to dest")
             rowsAffected = self.moveToDestination(transformedSource[lastTransformedId])
             endTime = time.time()
-            totalSecRun = str(datetime.timedelta(seconds=(endTime - startTime)))
+            totalSecRun = str(datetime.timedelta(seconds=round(endTime - startTime)))
             return {
                 "success": True,
                 "rowsAffected": rowsAffected,
-                "message": f"Successful run of pipeline: {self.name}. \nETL time: {totalSecRun}sec.\n{rowsAffected} rows affected.\nTotal rows: {transformedSource[lastTransformedId].shape[0]}",
+                "message": f"Successful run of pipeline: {self.name}. \nETL time: {totalSecRun} \n{rowsAffected} rows affected.\nTotal rows: {transformedSource[lastTransformedId].shape[0]}",
             }
         except Exception as e:
             return {"success": False, "error": str(e)}
