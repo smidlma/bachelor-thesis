@@ -54,7 +54,7 @@ const emit = defineEmits(['open', 'close', 'run'])
 
           <NSpace v-else>
             <NButton
-              :disabled="!props.pipeline.sources.length > 0"
+              :disabled="props.pipeline.sources.length <= 0"
               @click="emit('run', props.pipeline.id)"
               >Run</NButton
             >

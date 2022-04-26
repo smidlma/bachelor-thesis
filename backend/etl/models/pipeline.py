@@ -1,3 +1,4 @@
+import datetime
 import time
 from typing import List
 from pandas import DataFrame
@@ -68,7 +69,7 @@ class Pipeline(mongo.Document):
             log.info("Calling load to dest")
             rowsAffected = self.moveToDestination(transformedSource[lastTransformedId])
             endTime = time.time()
-            totalSecRun = "{:.2f}".format(endTime - startTime)
+            totalSecRun = str(datetime.timedelta(seconds=(endTime - startTime)))
             return {
                 "success": True,
                 "rowsAffected": rowsAffected,
