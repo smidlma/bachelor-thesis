@@ -53,3 +53,8 @@ npm install
 ```bash
 npm run dev
 ```
+> Build for deploy (build located in disc folder)
+
+```bash
+npm run build
+```
