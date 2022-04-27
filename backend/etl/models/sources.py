@@ -108,7 +108,6 @@ class Source(mongo.EmbeddedDocument):
         }
 
 
-#
 class CSV(Source):
     """
     Class for CSV files
@@ -204,8 +203,16 @@ class PostgreSQL(Source):
         if not self.testConnection():
             self.connection.connect()
 
+        dfTemp = pd.read_sql_query(
+            f"SELECT * FROM {self.tableName} LIMIT 1;",
+            self.connection.con,
+            index_col=None,
+        )
+
         self.dfSample = pd.read_sql_query(
-            f"SELECT * FROM {self.tableName} LIMIT {nrows};", self.connection.con
+            f"SELECT * FROM {self.tableName} LIMIT {nrows};",
+            self.connection.con,
+            index_col=dfTemp.columns[0],
         )
         return self.dfSample
 
@@ -216,11 +223,19 @@ class PostgreSQL(Source):
         fields = self.mappedSchema["fields"]
         cols = list(map(lambda x: x["name"], fields))
         types = {f["name"]: convertToPandasTypes(f["type"]) for f in fields}
-
-        return pd.read_sql_query(
-            f"SELECT * FROM {self.tableName};",
-            self.connection.con,
+        # datesParse  = list(filter(lambda x: x['type'] == ""))
+        print(types)
+        return pd.read_sql_table(
+            table_name=self.tableName,
+            con=self.connection.con,
+            columns=cols,
+            index_col=cols[0],
         )
+
+        # return pd.read_sql_query(
+        #     f"SELECT * FROM {self.tableName};",
+        #     self.connection.con,
+        # )
 
     def json(self):
         res = super().json()
