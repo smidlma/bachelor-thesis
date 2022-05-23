@@ -35,8 +35,8 @@ const formValue = ref({
 const handleValidateClick = (e: MouseEvent) => {
   e.preventDefault()
   formRef.value?.validate((errors) => {
-    emit('add', { sourceType: 'csv', ...formValue.value })
     if (!errors) {
+      emit('add', { sourceType: 'csv', ...formValue.value })
     } else {
       console.log(errors)
     }
