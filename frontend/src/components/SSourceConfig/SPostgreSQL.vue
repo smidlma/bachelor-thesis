@@ -41,8 +41,8 @@ const formValue = ref({
 const handleValidateClick = (e: MouseEvent) => {
   e.preventDefault()
   formRef.value?.validate((errors) => {
-    emit('add', { sourceType: 'postgresql', ...formValue.value })
     if (!errors) {
+      emit('add', { sourceType: 'postgresql', ...formValue.value })
     } else {
       console.log(errors)
     }
